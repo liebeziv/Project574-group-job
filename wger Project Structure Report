@@ -1,0 +1,61 @@
+wger Project Structure Report
+Group Member Information:
+
+Name: Simin Cheng, Student ID: 1663732, Email: sc1040@students.waikato.ac.nz
+Name: Bai Lu, Student ID: 1671298, Email: ys677@students.waikato.ac.nz
+Name: Ziqi Lin, Student ID: 1674249, Email: zl354@students.waikato.ac.nz
+Name: Zhengrong Chen, Student ID: 1660321, Email: zc199@students.waikato.ac.nz
+
+Project Overview
+
+Project Name and Functionality
+
+wger is a free, open-source fitness and nutrition manager designed to provide users with a comprehensive solution for tracking their fitness journey. The project aims to solve multiple problems related to personal fitness and nutrition planning.
+
+ Core Features
+
+wger offers the following main features to its users:
+
+Customizable Workout Plans: Create flexible workout routines with automated progression rules.
+Metric Tracking: Log and track diet plans, body weight, and custom measurement data.
+Nutrition Management: Log calorie intake using the Open Food Facts database.
+Exercise Encyclopedia: A built-in exercise database.
+Cross-Platform Applications: Available on Android, iOS, F-Droid, and Flathub.
+Self-Hosted Deployment: Use Docker to deploy the application and maintain control over your data.
+Multilingual Support: Community-translated through Weblate.
+API: A REST API that supports third-party integrations and automation.
+Gym Management: Includes basic gym management functionalities.
+
+License Information
+
+The project has a multi-license structure:
+
+Application Code:** GNU Affero General Public License 3.0 or later.
+Exercise/Food Data:** Creative Commons Attribution Share-Alike 3.0 (CC-BY-SA 3.0).
+Documentation:** Creative Commons Attribution Share-Alike (CC-BY-SA 4.0).
+
+Developer Code of Conduct and Contribution Guidelines
+
+The project follows standard open-source community practices. Developers are welcome to contribute in various forms, including but not limited to code, translations, and exercise data.
+
+Support Resources
+
+The project provides several support channels:
+
+Official Documentation: [https://wger.readthedocs.io/en/latest/](https://wger.readthedocs.io/en/latest/)
+Online Demo: [https://wger.de/zh-hans/software/features](https://wger.de/zh-hans/software/features)
+
+Interactive Discussion
+Discord: https://discord.gg/rPWFv6W
+Mastodon: https://fosstodon.org/@wger
+GitHub Issues:https://github.com/wger-project/wger/issues
+Translation Community (Weblate):https://hosted.weblate.org/engage/wger/
+
+高层次结构
+仓库组织形式：wger使用了多仓库单项目的组织结构，即一个项目分布在多个专门的仓库中，每个仓库负责项目的不同组件。这种结构允许不同技术栈的开发者
+专注在自己的领域中，保持项目的模块化和易于维护性。
+
+核心仓库
+  主仓库：wger-project/wger
+  用途：包含项目的核心Django后端应用
+  开发和访问原因：后端开发，API开发，数据模型定义
