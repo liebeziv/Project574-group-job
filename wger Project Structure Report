@@ -58,4 +58,5 @@ Translation Community (Weblate):https://hosted.weblate.org/engage/wger/
 核心仓库
   主仓库：wger-project/wger
   用途：包含项目的核心Django后端应用
-  开发和访问原因：后端开发，API开发，数据模型定义
+  开发和访问原因：后端开发，API开发，数据模型定义，业务逻辑实现
+  预期内容：Python/Django代码，数据库模型，REST API端点，部分前端组件
