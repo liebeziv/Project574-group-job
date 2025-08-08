@@ -58,7 +58,6 @@ wger uses a multi-repository, single-project structure, where a single project i
 
 Repository Identification
 Main Repository: wger-project/wger
-
 Purpose: Contains the core Django backend application.
 Developer Access Reason: Backend development, API development, data model definition, and business logic implementation.
 Expected Content: Python/Django code, database models, REST API endpoints, and some frontend components.
@@ -145,8 +144,20 @@ Node.js: Front-end assets
 npm: JS package manager
 virtualenv: Python virtual environment
 
-移动端架构（未完成）
-参考结构：技术特点，核心功能模块
+wger-project/flutter Mobile Architecture
+Technical Features:
+Uses the Dart programming language
+Material Design language
+REST API client implementation
+Multi-platform support (iOS, Android, web, Linux, macOS, Windows, Flatpak)
+
+Core Modules:
+User authentication and registration
+Workout plans
+Nutrition plans
+Progress tracking
+Offline data
+ 
 
 部署架构（docker）（未完成）
 参考架构：部署环境，服务组件
