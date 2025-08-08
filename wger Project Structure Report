@@ -200,10 +200,8 @@ Pagination and filtering for handling efficient data
 
 Development Environment
 Option 1 — Docker (recommended for most cases).
-Install Docker and Docker Compose.
-Clone the wger-project/docker repository and go into the docker/dev directory. Edit the .env file to adjust database, ports, and other settings. Start the services with docker compose up.
-Log in with the default development account: admin / adminadmin. Stop services when done with docker compose down.
+Install Docker and Docker Compose. Clone the wger-project/docker repository. Edit the .env file.
+Start with docker compose up and stop with docker compose down.
 Option 2 — Manual installation (for advanced customization).
-Install dependencies: Python3, PostgreSQL, Node.js, Yarn, Sass.
-Clone the wger-project/wger repository and enter the project directory.
-Create and activate a Python virtual environment with python -m venv venv and source venv/bin/activate. Install dependencies with pip install --upgrade pip and pip install -e .. Initialize the database with python manage.py migrate and load sample data with python manage.py loaddata fixtures. Start the development server with python manage.py runserver.
+Install dependencies: PostgreSQL, Node.js, Yarn, Sass. Clone the wger-project/wger repository.
+Create and activate a virtualenv with python -m venv venv and source venv/bin/activate. Install dependencies with pip install -e .. Collect resources with python manage.py collectstatic. Start with python manage.py runserver.
