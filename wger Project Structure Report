@@ -173,8 +173,27 @@ Reverse proxy container
 Task queue container
 Asynchronous task container
 
-API架构（未完成）
-参考架构：API特性，API端点
+wger-project/API
+RESTful API v2 built with Django REST Framework
+Base URL: /api/v2/
+Authentication:JWT tokens（suggested）or API Token
+Data Format: JSON input/output
+Documentation: /api/v2/schema/ui (Swagger UI) or /api/v2/schema/redoc (ReDoc)
+
+API Module Structure
+/api/v2/
+|- routine/      # Workout routines
+|- exercise/     # Exercise database
+|- workoutlog/   # Workout logs
+|- ingredient/   # Nutrition ingredients
+|- meal/         # Meal planning
+|- userprofile/  # User profiles
+|- weightentry/  # Weight tracking
+
+Key Features
+RESTful design with standard HTTP methods (GET, POST, PUT, DELETE)
+User data isolation, users only access their own data
+Pagination and filtering for handling efficient data
 
 数据架构（未完成）
 参考架构：数据实体内容
