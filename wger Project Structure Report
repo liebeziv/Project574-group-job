@@ -12,14 +12,14 @@ Project Name and Functionality
 
 wger is a free, open-source fitness and nutrition manager designed to provide users with a comprehensive solution for tracking their fitness journey. The project aims to solve multiple problems related to personal fitness and nutrition planning.
 
- Core Features
+Core Features
 
 wger offers the following main features to its users:
 
 Customizable Workout Plans: Create flexible workout routines with automated progression rules.
 Metric Tracking: Log and track diet plans, body weight, and custom measurement data.
 Nutrition Management: Log calorie intake using the Open Food Facts database.
-Exercise Encyclopedia: A built-in exercise database.
+Exercise Encyclopedia: A built-in exercise database with 659 exercises.
 Cross-Platform Applications: Available on Android, iOS, F-Droid, and Flathub.
 Self-Hosted Deployment: Use Docker to deploy the application and maintain control over your data.
 Multilingual Support: Community-translated through Weblate.
@@ -54,7 +54,8 @@ Translation Community (Weblate):https://hosted.weblate.org/engage/wger/
 
 High-Level Structure
 Repository Organization
-wger uses a multi-repository, single-project structure, where a single project is distributed across multiple specialized repositories. Each repository is responsible for a different component of the project. This structure allows developers with different technical expertise to focus on their specific areas, keeping the project modular and easy to maintain.
+wger uses a multi-repository, single-project structure with 13 specialized repositories, where a single project is distributed across multiple specialized repositories. Each repository is responsible for a different component of the project. This structure allows developers with different technical expertise to focus on their specific areas, keeping the project modular and easy to maintain.
+The project includes additional repositories for Kubernetes deployment (helm-charts), Unraid support (unraid-templates), and other specialized tools.
 
 Repository Identification
 Main Repository: wger-project/wger
@@ -106,13 +107,20 @@ Web Server:Nginx(reverse proxy)
 WSGI Server:Gunicorn
 
 Front-end
-Traditional Front-end: HTML, CSS, JavaScript, jQuery
-Charting Library: D3.js
-Modern Front-end: React, TypeScript
+UI Framework: Bootstrap 
+Interactive Enhancement: HTMX 
+JavaScript Library: jQuery 
+Build Tools: Yarn, Sass compilation
+Modern Components: React with TypeScript, Vite, ESLint
+Package Management: Yarn workspaces with automated resource deployment
 
 Mobile
-Mobile Framework: Flutter
-Supported Platforms: iOS, Android
+Mobile Framework: Flutter 
+Supported Platforms: Android, iOS, Web, Flatpak
+State Management: Provider  + Flutter Riverpod 
+Local Database: Drift 
+UI Components: Material Design + flex_color_scheme 
+Key Dependencies: 40+ libraries including fl_chart, http, font_awesome_flutter
 
 Deployment
 Containers: Docker, Docker Compose
@@ -149,7 +157,7 @@ Technical Features:
 Uses the Dart programming language
 Material Design language
 REST API client implementation
-Multi-platform support (iOS, Android, web, Linux, macOS, Windows, Flatpak)
+Multi-platform support (Android, iOS, F-Droid, and Flathub)
 
 Core Modules:
 User authentication and registration
@@ -166,12 +174,12 @@ Development environment configuration (dev)
 PostgreSQL development environment
 
 Service Components
-Web application container
-Database container
-Cache container
-Reverse proxy container
-Task queue container
-Asynchronous task container
+Django application server
+nginx: Reverse proxy and static file server  
+db: PostgreSQL database
+cache: Redis caching system
+celery_worker: Background task processor
+celery_beat: Scheduled task coordinator
 
 wger-project/API
 RESTful API v2 built with Django REST Framework
@@ -195,8 +203,15 @@ RESTful design with standard HTTP methods (GET, POST, PUT, DELETE)
 User data isolation, users only access their own data
 Pagination and filtering for handling efficient data
 
-数据架构（未完成）
-参考架构：数据实体内容
+Data Model Architecture
+Modular Design (exercises application)
+base.py: Abstract base models
+category.py: Exercise categorization
+equipment.py: Fitness equipment management
+muscle.py: Muscle group classification
+image.py, video.py: Media resource management
+translation.py: Multi-language support
+deletion_log.py: Data audit trail
 
 Development Environment
 Option 1 — Docker (recommended for most cases).
