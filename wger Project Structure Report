@@ -103,7 +103,8 @@ Database Support: PostgreSQL, SQLite
 API Framework: Django REST Framework
 Caching System: Redis
 Task Queue: Celery
-未完待续
+Web Server:Nginx(reverse proxy)
+WSGI Server:Gunicorn
 
 前端技术：（未完成）
 移动端（未完成）
