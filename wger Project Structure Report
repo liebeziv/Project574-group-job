@@ -120,17 +120,43 @@ Containers: Docker, Docker Compose
 Reverse Proxy: Nginx
 Process Manager: Supervisor
 
-主要组件架构
-主仓库架构（未完成）
-参考结构：模块目录 开发工具 技术特点 
+
+Main Component Architecture
+
+wger-project/wger Main Repository Architecture
+Key Modules:
+wger/: Django project root directory
+config/: Project configuration management module
+core/: Core module
+exercises/: Exercise management module
+gallery/: Progress photo album
+gym/: Gym management module
+locale/: Localization module
+mailer/: Mail system module
+manager/: Management functions
+measurements/: Body measurement data
+nutrition/: Nutrition management
+software/: Software information
+utils/: Utility functions
+
+Development Tools
+Python: Main programming language
+Node.js: Front-end assets
+npm: JS package manager
+virtualenv: Python virtual environment
+
 移动端架构（未完成）
 参考结构：技术特点，核心功能模块
+
 部署架构（docker）（未完成）
 参考架构：部署环境，服务组件
+
 API架构（未完成）
 参考架构：API特性，API端点
+
 数据架构（未完成）
 参考架构：数据实体内容
+
 开发环境（未完成）
 参考架构：多环境开发
 
