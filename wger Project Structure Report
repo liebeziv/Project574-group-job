@@ -58,19 +58,19 @@ wger uses a multi-repository, single-project structure, where a single project i
 
 Repository Identification
 Main Repository: wger-project/wger
-Purpose: Contains the core Django backend application.
+Purpose: This is the main server-side part of the project for managing workouts, nutrition plans, and body statistics.
 Developer Access Reason: Backend development, API development, data model definition, and business logic implementation.
 Expected Content: Python/Django code, database models, REST API endpoints, and some frontend components.
 
 Mobile Repository: wger-project/flutter
-Purpose: The mobile application.
-Developer Access Reason: Mobile app development, UI/UX design, and mobile-specific feature implementation.
+Purpose: A mobile application written in Flutter. Let users access the wger services on their mobile devices.
+Developer Access Reason:  to develop or maintain the mobile application, add new features, or fix bugs.
 Expected Content: Dart/Flutter code, mobile app interface, and API client implementations.
 
 Docker Repository: wger-project/docker
-Purpose: Docker Compose configuration and deployment scripts.
-Developer Access Reason: Setting up the development environment and containerization configuration.
-Expected Content: Docker configuration files, environment variable settings, and deployment documentation.
+Purpose: defines how to deploy the wger application using Docker.
+Developer Access Reason: test, develop, or production deployment of the application using Docker containers.
+Expected Content: Docker configuration files, environment variable settings, and instructions for building and running the application.
 
 Documentation Repository: wger-project/docs
 Purpose: Project documentation.
@@ -83,7 +83,7 @@ Developer Access Reason: Database initialization, food data management, and prep
 Expected Content: JSON/SQL data files and data import scripts.
 
 Frontend Repository: wger-project/react
-Purpose: The React frontend.
+Purpose: contains the React components used in the wger web interface.
 Developer Access Reason: Frontend development, UI component development, and user interface optimization.
 Expected Content: TypeScript/React code and frontend component libraries.
 
