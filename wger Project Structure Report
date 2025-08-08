@@ -103,3 +103,23 @@ Database Support: PostgreSQL, SQLite
 API Framework: Django REST Framework
 Caching System: Redis
 Task Queue: Celery
+未完待续
+
+前端技术：（未完成）
+移动端（未完成）
+部署（未完成）
+
+主要组件架构
+主仓库架构（未完成）
+参考结构：模块目录 开发工具 技术特点 
+移动端架构（未完成）
+参考结构：技术特点，核心功能模块
+部署架构（docker）（未完成）
+参考架构：部署环境，服务组件
+API架构（未完成）
+参考架构：API特性，API端点
+数据架构（未完成）
+参考架构：数据实体内容
+开发环境（未完成）
+参考架构：多环境开发
+
