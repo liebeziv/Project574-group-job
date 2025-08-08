@@ -60,54 +60,37 @@ Repository Identification
 Main Repository: wger-project/wger
 
 Purpose: Contains the core Django backend application.
-
 Developer Access Reason: Backend development, API development, data model definition, and business logic implementation.
-
 Expected Content: Python/Django code, database models, REST API endpoints, and some frontend components.
 
 Mobile Repository: wger-project/flutter
-
 Purpose: The mobile application.
-
 Developer Access Reason: Mobile app development, UI/UX design, and mobile-specific feature implementation.
-
 Expected Content: Dart/Flutter code, mobile app interface, and API client implementations.
 
 Docker Repository: wger-project/docker
-
 Purpose: Docker Compose configuration and deployment scripts.
-
 Developer Access Reason: Setting up the development environment and containerization configuration.
-
 Expected Content: Docker configuration files, environment variable settings, and deployment documentation.
 
 Documentation Repository: wger-project/docs
-
 Purpose: Project documentation.
-
 Developer Access Reason: Writing documentation, updating API documentation, and maintaining user guides.
-
 Expected Content: reStructuredText documents, Sphinx configuration, and technical documentation.
 
 Data Repository: wger-project/data
-
 Purpose: Raw and large datasets.
-
 Developer Access Reason: Database initialization, food data management, and preparing test data.
-
 Expected Content: JSON/SQL data files and data import scripts.
 
 Frontend Repository: wger-project/react
-
 Purpose: The React frontend.
-
 Developer Access Reason: Frontend development, UI component development, and user interface optimization.
-
 Expected Content: TypeScript/React code and frontend component libraries.
 
 Inter-Repository Relationships
-The repositories interact through well-defined API interfaces and data formats. The main repository provides REST API services, while the mobile and frontend components communicate with the backend via HTTP requests. The Docker repository integrates all these components to form a complete application stack.
-
+The repositories interact through well-defined API interfaces and data formats. The main repository provides REST API services, while the mobile and frontend components communicate with the backend via HTTP requests.
+The Docker repository integrates all these components to form a complete application stack.
 Project Architecture
 Overall Architecture
 wger uses a modern, microservices-style architecture. The backend is built on Django's Model-View-Template (MVT) pattern, combined with a RESTful API design, to support a variety of client applications.
@@ -116,11 +99,7 @@ Core Technology Stack
 Backend Technologies
 
 Core Framework: Django
-
 Database Support: PostgreSQL, SQLite
-
 API Framework: Django REST Framework
-
 Caching System: Redis
-
 Task Queue: Celery
