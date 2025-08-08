@@ -157,10 +157,21 @@ Workout plans
 Nutrition plans
 Progress tracking
 Offline data
- 
 
-部署架构（docker）（未完成）
-参考架构：部署环境，服务组件
+wger-project/docker Deployment Architecture
+Complete Docker deployment solution
+Deployment Environments
+Production environment configuration (prod)
+Development environment configuration (dev)
+PostgreSQL development environment
+
+Service Components
+Web application container
+Database container
+Cache container
+Reverse proxy container
+Task queue container
+Asynchronous task container
 
 API架构（未完成）
 参考架构：API特性，API端点
