@@ -106,9 +106,19 @@ Task Queue: Celery
 Web Server:Nginx(reverse proxy)
 WSGI Server:Gunicorn
 
-前端技术：（未完成）
-移动端（未完成）
-部署（未完成）
+Front-end
+Traditional Front-end: HTML, CSS, JavaScript, jQuery
+Charting Library: D3.js
+Modern Front-end: React, TypeScript
+
+Mobile
+Mobile Framework: Flutter
+Supported Platforms: iOS, Android
+
+Deployment
+Containers: Docker, Docker Compose
+Reverse Proxy: Nginx
+Process Manager: Supervisor
 
 主要组件架构
 主仓库架构（未完成）
