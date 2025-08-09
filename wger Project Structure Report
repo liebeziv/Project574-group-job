@@ -10,13 +10,13 @@ Project Overview
 
 Project Name and Functionality
 
-wger is a free, open-source fitness and nutrition manager designed to provide users with a comprehensive solution for tracking their fitness journey. The project aims to solve multiple problems related to personal fitness and nutrition planning.
+wger is a free, open-source fitness and nutrition manager designed to provide users with a fitness and nutrition solution for tracking their fitness journey. The project aims to solve multiple problems related to personal fitness and nutrition planning.
 
 Core Features
 
 wger offers the following main features to its users:
 
-Customizable Workout Plans: Create flexible workout routines with automated progression rules.
+Customizable Workout Plans: Create flexible workout routines with workout routine management.
 Metric Tracking: Log and track diet plans, body weight, and custom measurement data.
 Nutrition Management: Log calorie intake using the Open Food Facts database.
 Exercise Encyclopedia: A built-in exercise database with 659 exercises.
@@ -93,7 +93,7 @@ The repositories interact through well-defined API interfaces and data formats. 
 The Docker repository integrates all these components to form a complete application stack.
 Project Architecture
 Overall Architecture
-wger uses a modern, microservices-style architecture. The backend is built on Django's Model-View-Template (MVT) pattern, combined with a RESTful API design, to support a variety of client applications.
+wger uses a container-based architecture with six separate services. The backend is built on Django's Model-View-Template (MVT) pattern, combined with a RESTful API design, to support a variety of client applications.
 
 Core Technology Stack
 Backend Technologies
@@ -200,7 +200,7 @@ API Module Structure
 
 Key Features
 RESTful design with standard HTTP methods (GET, POST, PUT, DELETE)
-User data isolation, users only access their own data
+Authentication-based API access, users only access their own data
 Pagination and filtering for handling efficient data
 
 Data Model Architecture
