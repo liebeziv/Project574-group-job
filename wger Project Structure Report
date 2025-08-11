@@ -17,6 +17,7 @@ Core Features
 wger offers the following main features to its users:
 on dashboard user can see the workout routine, nutrition plan and Weight graph.
 also, user can trach above in calender.
+
 Customizable Workout Plans: 
 create workout routines-including define what exercise,how many sets,how much weight,how many repetitions,also superset and automated progression rule.
 after workout, user can record training log-date,time,notes,impression, specific exercise results(repetitions, weight, rir). log overview is provided.
@@ -31,12 +32,17 @@ tell user goal of Protein,Carbohydrates and Fat,and show total Macronutrient inf
 
 provide Daily calories calculator based on Basal metabolic rate and Physical activities. provide BMI(Body Mass Index）) calculator based on weight and height.
 
-Exercise Encyclopedia: A built-in exercise database.
+Exercise Wiki: provide a  built-in exercise database which user can search by name or filter by muscle/equipment/category. user can contrbute to it.
+
 Cross-Platform Applications: Available on Android, iOS, F-Droid, and Flathub.
 Self-Hosted Deployment: Use Docker to deploy the application and maintain control over your data.
-Multilingual Support: Community-translated through Weblate.
-API: A REST API that supports third-party integrations and automation.
-Gym Management: Includes basic gym management functionalities.
+
+Multilingual Support: Community-translated through Weblate, already got 41 language ,more than 60% of them are translated.
+get REST API for third-party integrations or automations.
+
+Includes basic gym management features managing both gyms and members
+ For example, trainers/coaches can follow their students progress, and gym managers are able to keep track of their members contracts. add members,deactivate  delete,members
+
 
 License Information
 
