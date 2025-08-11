@@ -11,6 +11,14 @@ Project Overview
 Project Name and Functionality
 
 wger is a free, open-source fitness and nutrition manager designed to provide users with a fitness and nutrition solution for tracking their fitness journey. The project aims to solve multiple problems related to personal fitness and nutrition planning.
+//修改项目概述  自托管的自由开源软件健身/锻炼、营养和体重跟踪器 去掉659  详细展开各部分功能
+
+
+
+创建新功能前需要开启issue讨论
+代码格式要求：
+测试要求：
+新功能需要写测试
 
 Core Features
 
@@ -36,7 +44,7 @@ Cross-Platform Applications: Available on Android, iOS, F-Droid, and Flathub.
 Self-Hosted Deployment: Use Docker to deploy the application and maintain control over your data.
 Multilingual Support: Community-translated through Weblate.
 API: A REST API that supports third-party integrations and automation.
-Gym Management: Includes basic gym management functionalities.
+Gym Management: Includes basic gym management  .
 
 License Information
 
@@ -49,8 +57,10 @@ Documentation: Creative Commons Attribution Share-Alike (CC-BY-SA 4.0).
 Developer Code of Conduct and Contribution Guidelines
 (doesn;t have a Code of Conduct)
 The project follows standard open-source community practices. Developers are welcome to contribute in various forms, including but not limited to code, translations, and exercise data.
+//增加行为准则，贡献准则：贡献要求 非标准开源社区
 
 Support Resources
+//需要说明面向对象是谁？按用户类型分类支持资源，明确各资源的目标用户群体和用途，解决会议中提到的资源用途不明确问题
 
 The project provides several support channels:
 
@@ -69,6 +79,7 @@ Repository Organization
 wger uses a multi-repository, single-project structure with 13 specialized repositories, where a single project is distributed across multiple specialized repositories. Each repository is responsible for a different component of the project. This structure allows developers with different technical expertise to focus on their specific areas, keeping the project modular and easy to maintain.
 The project includes additional repositories for Kubernetes deployment (helm-charts), Unraid support (unraid-templates), and other specialized tools.
 
+//Repository改成4个
 Repository Identification
 Main Repository: wger-project/wger
 Purpose: This is the main server-side part of the project for managing workouts, nutrition plans, and body statistics.
@@ -100,12 +111,14 @@ Purpose: contains the React components used in the wger web interface.
 Developer Access Reason: Frontend development, UI component development, and user interface optimization.
 Expected Content: TypeScript/React code and frontend component libraries.
 
+//添加官方文档引用，明确仓库间的实际交互方式
 Inter-Repository Relationships
 The repositories interact through well-defined API interfaces and data formats. The main repository provides REST API services, while the mobile and frontend components communicate with the backend via HTTP requests.
 The Docker repository integrates all these components to form a complete application stack.
 Project Architecture
 Overall Architecture
 wger uses a container-based architecture with six separate services. The backend is built on Django's Model-View-Template (MVT) pattern, combined with a RESTful API design, to support a variety of client applications.
+//去掉基于container的部署形式，简述docker部署，说明非docker部署的困难
 
 Core Technology Stack
 Backend Technologies
@@ -139,7 +152,7 @@ Containers: Docker, Docker Compose
 Reverse Proxy: Nginx
 Process Manager: Supervisor
 
-
+//各模块功能详细说明
 Main Component Architecture
 
 wger-project/wger Main Repository Architecture
@@ -158,6 +171,7 @@ nutrition/: Nutrition management
 software/: Software information
 utils/: Utility functions
 
+//说明各个版本号
 Development Tools
 Python: Main programming language
 Node.js: Front-end assets
@@ -171,6 +185,7 @@ Material Design language
 REST API client implementation
 Multi-platform support (Android, iOS, F-Droid, and Flathub)
 
+//说明模块结构的一致性，用途说明
 Core Modules:
 User authentication and registration
 Workout plans
@@ -200,6 +215,7 @@ Authentication:JWT tokens（suggested）or API Token
 Data Format: JSON input/output
 Documentation: /api/v2/schema/ui (Swagger UI) or /api/v2/schema/redoc (ReDoc)
 
+//缺少API到代码的映射关系
 API Module Structure
 /api/v2/
 |- routine/      # Workout routines
@@ -215,6 +231,7 @@ RESTful design with standard HTTP methods (GET, POST, PUT, DELETE)
 Authentication-based API access, users only access their own data
 Pagination and filtering for handling efficient data
 
+//添加文件路径
 Data Model Architecture
 Modular Design (exercises application)
 base.py: Abstract base models
@@ -225,6 +242,7 @@ image.py, video.py: Media resource management
 translation.py: Multi-language support
 deletion_log.py: Data audit trail
 
+//增加已知部署问题和解决方案
 Development Environment
 Option 1 — Docker (recommended for most cases).
 Install Docker and Docker Compose. Clone the wger-project/docker repository. Edit the .env file.
