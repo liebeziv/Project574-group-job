@@ -207,7 +207,7 @@ Production environment configuration (prod)
 Development environment configuration (dev)
 PostgreSQL development environment
 
-Service Components
+Service Components 
 Django application server
 nginx: Reverse proxy and static file server  
 db: PostgreSQL database
@@ -215,14 +215,14 @@ cache: Redis caching system
 celery_worker: Background task processor
 celery_beat: Scheduled task coordinator
 
-wger-project/API // 没有这个repository 
+wger-project/API // 没有这个repository ，缺少Frontend Repository: wger-project/react
 RESTful API v2 built with Django REST Framework
 Base URL: /api/v2/
 Authentication:JWT tokens（suggested）or API Token
 Data Format: JSON input/output
 Documentation: /api/v2/schema/ui (Swagger UI) or /api/v2/schema/redoc (ReDoc)
 
-//缺少API到代码的映射关系
+//缺少API到代码的映射关系，优先级靠后
 API Module Structure
 /api/v2/
 |- routine/      # Workout routines
@@ -238,7 +238,7 @@ RESTful design with standard HTTP methods (GET, POST, PUT, DELETE)
 Authentication-based API access, users only access their own data
 Pagination and filtering for handling efficient data
 
-//添加文件路径
+//添加文件路径 //路径可以是relative paths within repository and/or repository links
 Data Model Architecture
 Modular Design (exercises application)
 base.py: Abstract base models
