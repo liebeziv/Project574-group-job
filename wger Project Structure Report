@@ -208,7 +208,7 @@ cache: Redis caching system
 celery_worker: Background task processor
 celery_beat: Scheduled task coordinator
 
-wger-project/API
+API Architecture and Component Integration
 RESTful API v2 built with Django REST Framework
 Base URL: /api/v2/
 Authentication:JWT tokens（suggested）or API Token
@@ -216,15 +216,35 @@ Data Format: JSON input/output
 Documentation: /api/v2/schema/ui (Swagger UI) or /api/v2/schema/redoc (ReDoc)
 
 //缺少API到代码的映射关系
-API Module Structure
-/api/v2/
-|- routine/      # Workout routines
-|- exercise/     # Exercise database
-|- workoutlog/   # Workout logs
-|- ingredient/   # Nutrition ingredients
-|- meal/         # Meal planning
-|- userprofile/  # User profiles
-|- weightentry/  # Weight tracking
+API endpoint Module Structure
+1.Core Module (wger/wger/core/api/views.py)
+/userprofile/ for the user profile
+
+2.Manager Module（wger/wger/manager/api/views.py）
+/routine/ for routine objects
+/workoutlog/ for workout log objects
+/workoutsession/ for workout sessions objects
+/templates/ for routine template objects
+
+3.Exercises Module (wger/wger/exercises/api/views.py)
+/exercise/ for exercise objects.
+/exerciseinfo/ Read-only info for exercise objects
+
+4.Nutrition Module (wger/wger/nutrition/api/views.py)
+/ingredient/ for ingredient objects
+/ingredientinfo/ Read-only info for ingredient objects
+/nutritionplan/ for nutrition plan objects
+/meal/ for meal objects
+/nutritiondiary/ for a meal log item
+
+5.Weight Module (wger/wger/weight/api/views.py)
+/weightentry/ for weight tracking
+
+6.Measurements Module (wger/wger/measurements/api/views.py)
+/measurement/ for body measurements
+
+7.Gallery Module （wger/wger/gallery/api/views.py）
+/gallery/ for gallery image
 
 Key Features
 RESTful design with standard HTTP methods (GET, POST, PUT, DELETE)
