@@ -10,9 +10,7 @@ Project Overview
 
 Project Name and Functionality
 
-wger is a free, open-source fitness and nutrition manager designed to provide users with a fitness and nutrition solution for tracking their fitness journey. The project aims to solve multiple problems related to personal fitness and nutrition planning.
-//修改项目概述  自托管的自由开源软件健身/锻炼、营养和体重跟踪器 去掉659  详细展开各部分功能
-
+wger is an open-source fitness and nutrition management application that helps users plan, track, and analyse their workouts, diet, and progress. It combines workout planning, nutrition tracking, and basic gym management in one platform, available across multiple devices and deployment options.
 
 
 创建新功能前需要开启issue讨论
@@ -56,24 +54,32 @@ Application Code: GNU Affero General Public License 3.0 or later.
 Exercise/Food Data: Creative Commons Attribution Share-Alike 3.0 (CC-BY-SA 3.0).
 Documentation: Creative Commons Attribution Share-Alike (CC-BY-SA 4.0).
 
-Developer Code of Conduct and Contribution Guidelines
+Contribution Guidelines
+link：https://wger.readthedocs.io/en/latest/contributing.html
+Contributors are encouraged across different areas (code, translations, documentation).Contributing Guide provides specific guidelines such as using feature branches, writing good commit messages, testing changes, and code formatting.
 
-The project follows standard open-source community practices. Developers are welcome to contribute in various forms, including but not limited to code, translations, and exercise data.
-//增加行为准则，贡献准则：贡献要求 非标准开源社区
 
 Support Resources
-//需要说明面向对象是谁？按用户类型分类支持资源，明确各资源的目标用户群体和用途，解决会议中提到的资源用途不明确问题
+ development
+for developers who want to work on the backend/fontend/mobile app:
+https://wger.readthedocs.io/en/latest/index.html#development
 
-The project provides several support channels:
+deployment
+for fitness enthusiasts or Gyms/Fitness Studios who want full control :
+https://wger.readthedocs.io/en/latest/index.html#installation-production
 
-Official Documentation: https://wger.readthedocs.io/en/latest/
-Online Demo: https://wger.de/zh-hans/software/features
+for Administration (e.g. system administrators or technical staff managing the wger server):
+(to manage the application , sync exercises and ingredients,setting,Authentication Proxy (SSO))
+https://wger.readthedocs.io/en/latest/index.html#administration
 
-Interactive Discussion
+for developers who want to use API(Public endpoints like list of exercises or the ingredients,user owned objects like routine)
+to Sync workout logs from IoT devices (e.g., smart scales, fitness trackers) or Manage large user bases (e.g., gym chains).:
+https://wger.readthedocs.io/en/latest/index.html#api
+
+Interactive Discussion for anyone who use wger
 Discord: https://discord.gg/rPWFv6W
 Mastodon: https://fosstodon.org/@wger
-GitHub Issues:https://github.com/wger-project/wger/issues
-Translation Community (Weblate):https://hosted.weblate.org/engage/wger/
+
 
 
 High-Level Structure
@@ -117,6 +123,7 @@ Expected Content: TypeScript/React code and frontend component libraries.
 Inter-Repository Relationships
 The repositories interact through well-defined API interfaces and data formats. The main repository provides REST API services, while the mobile and frontend components communicate with the backend via HTTP requests.
 The Docker repository integrates all these components to form a complete application stack.
+
 Project Architecture
 Overall Architecture
 wger uses a container-based architecture with six separate services. The backend is built on Django's Model-View-Template (MVT) pattern, combined with a RESTful API design, to support a variety of client applications.
@@ -169,8 +176,8 @@ locale/: Localization module
 mailer/: Mail system module
 manager/: Management functions
 measurements/: Body measurement data
-nutrition/: Nutrition management
-software/: Software information
+nutrition/: Nutrition management // 需要说明在做什么
+software/: Software information  // 需要说明在做什么
 utils/: Utility functions
 
 //说明各个版本号
@@ -195,7 +202,7 @@ Nutrition plans
 Progress tracking
 Offline data
 
-wger-project/docker Deployment Architecture
+wger-project/docker Deployment Architecture // 需要增加细节
 Complete Docker deployment solution
 Deployment Environments
 Production environment configuration (prod)
@@ -210,7 +217,7 @@ cache: Redis caching system
 celery_worker: Background task processor
 celery_beat: Scheduled task coordinator
 
-API Architecture and Component Integration
+wger-project/API // 没有这个repository 
 RESTful API v2 built with Django REST Framework
 Base URL: /api/v2/
 Authentication:JWT tokens（suggested）or API Token
@@ -218,35 +225,15 @@ Data Format: JSON input/output
 Documentation: /api/v2/schema/ui (Swagger UI) or /api/v2/schema/redoc (ReDoc)
 
 //缺少API到代码的映射关系
-API endpoint Module Structure
-1.Core Module (wger/wger/core/api/views.py)
-/userprofile/ for the user profile
-
-2.Manager Module（wger/wger/manager/api/views.py）
-/routine/ for routine objects
-/workoutlog/ for workout log objects
-/workoutsession/ for workout sessions objects
-/templates/ for routine template objects
-
-3.Exercises Module (wger/wger/exercises/api/views.py)
-/exercise/ for exercise objects.
-/exerciseinfo/ Read-only info for exercise objects
-
-4.Nutrition Module (wger/wger/nutrition/api/views.py)
-/ingredient/ for ingredient objects
-/ingredientinfo/ Read-only info for ingredient objects
-/nutritionplan/ for nutrition plan objects
-/meal/ for meal objects
-/nutritiondiary/ for a meal log item
-
-5.Weight Module (wger/wger/weight/api/views.py)
-/weightentry/ for weight tracking
-
-6.Measurements Module (wger/wger/measurements/api/views.py)
-/measurement/ for body measurements
-
-7.Gallery Module （wger/wger/gallery/api/views.py）
-/gallery/ for gallery image
+API Module Structure
+/api/v2/
+|- routine/      # Workout routines
+|- exercise/     # Exercise database
+|- workoutlog/   # Workout logs
+|- ingredient/   # Nutrition ingredients
+|- meal/         # Meal planning
+|- userprofile/  # User profiles
+|- weightentry/  # Weight tracking
 
 Key Features
 RESTful design with standard HTTP methods (GET, POST, PUT, DELETE)
