@@ -15,10 +15,22 @@ wger is a free, open-source fitness and nutrition manager designed to provide us
  Core Features
 
 wger offers the following main features to its users:
+on dashboard user can see the workout routine, nutrition plan and Weight graph.
+also, user can trach above in calender.
+Customizable Workout Plans: 
+create workout routines-including define what exercise,how many sets,how much weight,how many repetitions,also superset and automated progression rule.
+after workout, user can record training log-date,time,notes,impression, specific exercise results(repetitions, weight, rir). log overview is provided.
+user can download routine or see it in table view,create template.
+user can log the measurment of whatever part of body they want, like today, arm ,26cm.
+also got body weight overview where uers can add weight record and a table and graph will automaticaly show the statics.
 
-Customizable Workout Plans: Create flexible workout routines with automated progression rules.
-Metric Tracking: Log and track diet plans, body weight, and custom measurement data.
-Nutrition Management: Log calorie intake using the Open Food Facts database.
+about nutrition:
+when add a meal user can input ingredient name and amount. it will show it's Macronutrient infomation and energy.
+tell user goal of Protein,Carbohydrates and Fat,and show total Macronutrient infomation and energy after logged.
+
+
+provide Daily calories calculator based on Basal metabolic rate and Physical activities. provide BMI(Body Mass Index）) calculator based on weight and height.
+
 Exercise Encyclopedia: A built-in exercise database.
 Cross-Platform Applications: Available on Android, iOS, F-Droid, and Flathub.
 Self-Hosted Deployment: Use Docker to deploy the application and maintain control over your data.
@@ -35,7 +47,7 @@ Exercise/Food Data: Creative Commons Attribution Share-Alike 3.0 (CC-BY-SA 3.0).
 Documentation: Creative Commons Attribution Share-Alike (CC-BY-SA 4.0).
 
 Developer Code of Conduct and Contribution Guidelines
-
+(doesn;t have a Code of Conduct)
 The project follows standard open-source community practices. Developers are welcome to contribute in various forms, including but not limited to code, translations, and exercise data.
 
 Support Resources
