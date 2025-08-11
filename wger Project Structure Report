@@ -21,35 +21,31 @@ wger is a free, open-source fitness and nutrition manager designed to provide us
 新功能需要写测试
 
 Core Features
+wger offers a comprehensive set of features designed to help users manage and track their fitness and nutrition goals.
 
-wger offers the following main features to its users:
-on dashboard user can see the workout routine, nutrition plan and Weight graph.
-also, user can trach above in calender.
+On the dashboard, users can view their workout routine, nutrition plan, and body weight graph. All these can also be tracked using a built-in calendar.
 
-Customizable Workout Plans: 
-create workout routines-including define what exercise,how many sets,how much weight,how many repetitions,also superset and automated progression rule.
-after workout, user can record training log-date,time,notes,impression, specific exercise results(repetitions, weight, rir). log overview is provided.
-user can download routine or see it in table view,create template.
-user can log the measurment of whatever part of body they want, like today, arm ,26cm.
-also got body weight overview where uers can add weight record and a table and graph will automaticaly show the statics.
+Customizable Workout Plans
+Users can create workout routines by defining the exercises, number of sets, weight, repetitions, and even supersets or automated progression rules. After completing a workout, they can record a detailed training log, including date, time, notes, overall impression, and specific exercise results (repetitions, weight, RIR). A log overview is also provided.
 
-about nutrition:
-when add a meal user can input ingredient name and amount. it will show it's Macronutrient infomation and energy.
-tell user goal of Protein,Carbohydrates and Fat,and show total Macronutrient infomation and energy after logged.
+Workout routines can be downloaded or viewed in a table format, and users can create reusable templates. Body measurements can be tracked for any part of the body—for example, logging that an arm measures 26 cm today. A body weight overview allows users to add weight records, with statistics automatically displayed in both table and graph formats.
 
+Nutrition Tracking
+When adding a meal, users can enter an ingredient name and amount to view its nutrition information. The application tracks daily totals for protein, carbohydrates, and fat, and compares them with the user’s target goals.
 
-provide Daily calories calculator based on Basal metabolic rate and Physical activities. provide BMI(Body Mass Index）) calculator based on weight and height.
+Additional tools include a daily calorie calculator based on basal metabolic rate (BMR) and physical activity level, as well as a body mass index (BMI) calculator based on weight and height.
 
-Exercise Wiki: provide a  built-in exercise database which user can search by name or filter by muscle/equipment/category. user can contrbute to it.
+Exercise Wiki
+A built-in exercise database lets users search by name or filter by muscle group, equipment, or category. Users can also contribute new exercise to the database.
 
-Cross-Platform Applications: Available on Android, iOS, F-Droid, and Flathub.
-Self-Hosted Deployment: Use Docker to deploy the application and maintain control over your data.
+Platform and Deployment
+Wger is available as a cross-platform application for Android, iOS, F-Droid, and Flathub. It also supports self-hosted deployment via Docker, for full control.
 
-Multilingual Support: Community-translated through Weblate, already got 41 language ,more than 60% of them are translated.
-get REST API for third-party integrations or automations.
+Multilingual Support and Integrations
+Wger supports 41 languages, with more than 60% already translated, thanks to community contributions via Weblate. A REST API is available for third-party integrations and automation.
 
-Includes basic gym management features managing both gyms and members
- For example, trainers/coaches can follow their students progress, and gym managers are able to keep track of their members contracts. add members,deactivate  delete,members
+Gym Management
+Basic gym management features are included, enabling trainers and coaches to monitor their students’ progress, and allowing gym managers to keep track of member contracts. Members can be added, deactivated, or removed as needed.
 
 
 License Information
