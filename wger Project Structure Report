@@ -58,27 +58,25 @@ Contribution Guidelines
 link：https://wger.readthedocs.io/en/latest/contributing.html
 Contributors are encouraged across different areas (code, translations, documentation).Contributing Guide provides specific guidelines such as using feature branches, writing good commit messages, testing changes, and code formatting.
 
-
 Support Resources
- development
-for developers who want to work on the backend/fontend/mobile app:
-https://wger.readthedocs.io/en/latest/index.html#development
 
-deployment
-for fitness enthusiasts or Gyms/Fitness Studios who want full control :
-https://wger.readthedocs.io/en/latest/index.html#installation-production
+Development – For developers working on the backend, frontend, or mobile app.
+Documentation: Development Guide
 
-for Administration (e.g. system administrators or technical staff managing the wger server):
-(to manage the application , sync exercises and ingredients,setting,Authentication Proxy (SSO))
-https://wger.readthedocs.io/en/latest/index.html#administration
+Deployment – For fitness enthusiasts or gyms/fitness studios who want full control over their installation.
+Documentation: Installation & Production Guide
 
-for developers who want to use API(Public endpoints like list of exercises or the ingredients,user owned objects like routine)
-to Sync workout logs from IoT devices (e.g., smart scales, fitness trackers) or Manage large user bases (e.g., gym chains).:
-https://wger.readthedocs.io/en/latest/index.html#api
+Administration – For system administrators or technical staff managing a wger server.
+Covers tasks such as managing the application, syncing exercises and ingredients, configuring settings, and setting up an authentication proxy (SSO).
+Documentation: Administration Guide
 
-Interactive Discussion for anyone who use wger
-Discord: https://discord.gg/rPWFv6W
-Mastodon: https://fosstodon.org/@wger
+API – For developers using wger’s API, including public endpoints (e.g., list of exercises or ingredients) and user-owned objects (e.g., workout routines).
+Suitable for syncing workout logs from IoT devices (e.g., smart scales, fitness trackers) or managing large user bases (e.g., gym chains).
+Documentation: API Guide
+
+Interactive Discussion – For anyone using wger to ask questions, share feedback, or discuss ideas.
+Discord: Join here
+Mastodon: Follow here
 
 
 
