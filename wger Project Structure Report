@@ -124,13 +124,13 @@ wger uses a container-based architecture with six separate services. The backend
 
 Core Technology Stack
 Backend
-Python 3.10-3.13 with Django 5.2.3
-Django REST Framework 3.16.0 for API endpoints
-PostgreSQL / SQLite for data support
-Redis for caching and session storage
-Celery 5.5.3 for background task processing
-Web Server:Nginx(reverse proxy)
-WSGI Server:Gunicorn
+Core Framework: Python 3.10-3.13 with Django 5.2.3
+API Endpoints: Django REST Framework 3.16.0
+Data Support: PostgreSQL / SQLite
+Caching System: Redis
+Background Processing: Celery 5.5.3
+Web Server: Nginx(reverse proxy)
+WSGI Server: Gunicorn 23.0.0
 
 Front-end
 UI Framework: Bootstrap 5.3.7
