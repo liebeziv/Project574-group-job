@@ -123,30 +123,29 @@ wger uses a container-based architecture with six separate services. The backend
 //去掉基于container的部署形式，简述docker部署，说明非docker部署的困难
 
 Core Technology Stack
-Backend Technologies
-
-Core Framework: Django
-Database Support: PostgreSQL, SQLite
-API Framework: Django REST Framework
-Caching System: Redis
-Task Queue: Celery
+Backend
+Python 3.10-3.13 with Django 5.2.3
+Django REST Framework 3.16.0 for API endpoints
+PostgreSQL / SQLite for data support
+Redis for caching and session storage
+Celery 5.5.3 for background task processing
 Web Server:Nginx(reverse proxy)
 WSGI Server:Gunicorn
 
 Front-end
-UI Framework: Bootstrap 
-Interactive Enhancement: HTMX 
-JavaScript Library: jQuery 
-Build Tools: Yarn, Sass compilation
-Modern Components: React with TypeScript, Vite, ESLint
+UI Framework: Bootstrap 5.3.7
+Interactive Enhancement: HTMX 2.0.5
+JavaScript Library: jQuery 3.7.1
+Build Tools: yarn@4.9.2, Sass compilation
+Modern Components: React 19.1.0, TypeScript 5.8.2, Vite 6.3.5, ESLint 9.28.0
 Package Management: Yarn workspaces with automated resource deployment
 
 Mobile
-Mobile Framework: Flutter 
+Mobile Framework: Flutter (SDK >=3.0.0)
 Supported Platforms: Android, iOS, Web, Flatpak
-State Management: Provider  + Flutter Riverpod 
-Local Database: Drift 
-UI Components: Material Design + flex_color_scheme 
+State Management: Provider 6.1.5 + Flutter Riverpod 2.6.1
+Local Database: Drift 2.27.0
+UI Components: Material Design + flex_color_scheme 8.1.1
 Key Dependencies: 40+ libraries including fl_chart, http, font_awesome_flutter
 
 Deployment
