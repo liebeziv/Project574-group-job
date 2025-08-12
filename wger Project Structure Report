@@ -82,45 +82,40 @@ Mastodon: [Follow here](https://fosstodon.org/@wger)
 
 High-Level Structure
 Repository Organization
-wger uses a multi-repository, single-project structure with 13 specialized repositories, where a single project is distributed across multiple specialized repositories. Each repository is responsible for a different component of the project. This structure allows developers with different technical expertise to focus on their specific areas, keeping the project modular and easy to maintain.
+Wger uses a multi-repository, single-project structure with 4 core specialized repositories, where a single project is distributed across multiple specialized repositories. Each repository is responsible for a different component of the project. This structure allows developers with different technical expertise to focus on their specific areas, keeping the project modular and easy to maintain.
 The project includes additional repositories for Kubernetes deployment (helm-charts), Unraid support (unraid-templates), and other specialized tools.
 
-//Repository改成4个
 Repository Identification
-Main Repository: wger-project/wger
-Purpose: This is the main server-side part of the project for managing workouts, nutrition plans, and body statistics.
-Developer Access Reason: Backend development, API development, data model definition, and business logic implementation.
+Backend Repository: wger-project/wger
+Purpose: The Django-based REST API server and web backend of the project for managing workouts, nutrition plans, and body statistics.
+Developer Access Reason:
+-Implementing business logic, API endpoints, and data models
+-Configuring server-side settings and deployments
+-Adding new fitness exercises, nutrition data, or workout features
 Expected Content: Python/Django code, database models, REST API endpoints, and some frontend components.
+
+Frontend Repository: wger-project/react
+Purpose: Contains the React components used in the wger web interface.
+Developer Access Reason:
+-Building web components
+-Implementing UI patterns
+-User interface optimization
+Expected Content: TypeScript/React code and frontend component libraries.
 
 Mobile Repository: wger-project/flutter
 Purpose: A mobile application written in Flutter. Let users access the wger services on their mobile devices.
-Developer Access Reason:  to develop or maintain the mobile application, add new features, or fix bugs.
+Developer Access Reason:
+-Develop or maintain the mobile application
+-Implementing responsive mobile interface
+-Handling iOS/Android deployments
 Expected Content: Dart/Flutter code, mobile app interface, and API client implementations.
 
 Docker Repository: wger-project/docker
-Purpose: defines how to deploy the wger application using Docker.
-Developer Access Reason: test, develop, or production deployment of the application using Docker containers.
+Purpose: Deploy the wger application using Docker.
+Developer Access Reason:
+-Set up production environments
+-Create local development environments
 Expected Content: Docker configuration files, environment variable settings, and instructions for building and running the application.
-
-Documentation Repository: wger-project/docs
-Purpose: Project documentation.
-Developer Access Reason: Writing documentation, updating API documentation, and maintaining user guides.
-Expected Content: reStructuredText documents, Sphinx configuration, and technical documentation.
-
-Data Repository: wger-project/data
-Purpose: Raw and large datasets.
-Developer Access Reason: Database initialization, food data management, and preparing test data.
-Expected Content: JSON/SQL data files and data import scripts.
-
-Frontend Repository: wger-project/react
-Purpose: contains the React components used in the wger web interface.
-Developer Access Reason: Frontend development, UI component development, and user interface optimization.
-Expected Content: TypeScript/React code and frontend component libraries.
-
-//添加官方文档引用，明确仓库间的实际交互方式
-Inter-Repository Relationships
-The repositories interact through well-defined API interfaces and data formats. The main repository provides REST API services, while the mobile and frontend components communicate with the backend via HTTP requests.
-The Docker repository integrates all these components to form a complete application stack.
 
 Project Architecture
 Overall Architecture
