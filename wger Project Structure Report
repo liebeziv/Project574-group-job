@@ -243,11 +243,18 @@ image.py, video.py: Media resource management
 translation.py: Multi-language support
 deletion_log.py: Data audit trail
 
-//增加已知部署问题和解决方案
 Development Environment
 Option 1 — Docker (recommended for most cases).
-Install Docker and Docker Compose. Clone the wger-project/docker repository. Edit the .env file.
-Start with docker compose up and stop with docker compose down.
+1. Install Docker and Docker Compose. Clone the wger-project/docker repository. Edit the .env file.
+2. Start with docker compose up and stop with docker compose down.
+3. If frontend build fails with yarn: not found: the dev image is missing Yarn. In your dev Dockerfile, enable/install Yarn (e.g., enable Corepack or install Yarn directly) and submit a small PR explaining why it’s needed and what you changed.
+Docker deployment (official): https://wger.readthedocs.io/en/latest/production/docker.html
 Option 2 — Manual installation (for advanced customization).
-Install dependencies: PostgreSQL, Node.js, Yarn, Sass. Clone the wger-project/wger repository.
-Create and activate a virtualenv with python -m venv venv and source venv/bin/activate. Install dependencies with pip install -e .. Collect resources with python manage.py collectstatic. Start with python manage.py runserver.
+1. Install dependencies: Python 3, PostgreSQL, Node.js, Yarn, Sass. Clone the wger-project/wger repository.
+2.Create and activate a virtualenv with python -m venv venv and source venv/bin/activate. Install dependencies with pip install -e .. Collect resources with python manage.py collectstatic.
+3.Start with python manage.py runserver.
+4.From the relevant frontend directory, run yarn install and yarn dev.
+- If you rely on the standalone react repo, do this in that repo.
+- If you build static assets inside the Django repo, follow the main repo’s instructions.
+- If Yarn is missing or the version mismatches, apply the Yarn handling noted above.
+Manual installation (official): https://wger.readthedocs.io/en/latest/production/installation.html
