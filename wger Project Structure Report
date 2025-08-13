@@ -112,8 +112,9 @@ Expected Content: Docker configuration files, environment variable settings, and
 
 Project Architecture
 Overall Architecture
-wger uses a container-based architecture with six separate services. The backend is built on Django's Model-View-Template (MVT) pattern, combined with a RESTful API design, to support a variety of client applications.
-//去掉基于container的部署形式，简述docker部署，说明非docker部署的困难
+wger is designed for simple self-hosting, with Docker being the primary and recommended deployment method. As stated in the README: ‘Hosting your own instance basically only requires a docker compose up -d.’
+Although it is technically possible to run wger without containers, this makes the setup process very complicated. Therefore, using Docker provides the best setup and maintenance experience.
+The system is built using Django's Model-View-Template (MVT) pattern, combined with RESTful API design, supporting various client applications.
 
 Core Technology Stack
 Backend
@@ -146,31 +147,43 @@ Containers: Docker, Docker Compose
 Reverse Proxy: Nginx
 Process Manager: Supervisor
 
-//各模块功能详细说明
 Main Component Architecture
 
 wger-project/wger Main Repository Architecture
 Key Modules:
 wger/: Django project root directory
+  Contains the main Django configuration files (settings.py, urls.py, wsgi.py) 
+  Entry point and global configuration for the project
 config/: Project configuration management module
+  Handling Environment Variables and Configuration Files 
+  Managing Configuration Differences Across Environments
 core/: Core module
+  User authentication, rights management 
+  Base model and generic functionality
 exercises/: Exercise management module
+  CRUD operations for exercise database
+  Exercise classification, muscle group, equipment management
 gallery/: Progress photo album
+  Upload and storage management of user progress photos
 gym/: Gym management module
+  Basic information management for gyms
+  Member management and permission allocation
 locale/: Localization module
+  Multilingual support and translation management
 mailer/: Mail system module
+  Email sending function
 manager/: Management functions
+  System administrator functions
 measurements/: Body measurement data
-nutrition/: Nutrition management // 需要说明在做什么
-software/: Software information  // 需要说明在做什么
+  Recording and tracking of user physical indicators
+nutrition/: Nutrition management 
+  Food database management (based on Open Food Facts)
+  Meal logging and nutrient calculation
+  Macronutrient goal setting and tracking
+software/: Software information 
+  Application version information and update log
 utils/: Utility functions
-
-//说明各个版本号
-Development Tools
-Python: Main programming language
-Node.js: Front-end assets
-npm: JS package manager
-virtualenv: Python virtual environment
+  General-purpose utility functions and helper classes
 
 wger-project/flutter Mobile Architecture
 Technical Features:
@@ -179,20 +192,25 @@ Material Design language
 REST API client implementation
 Multi-platform support (Android, iOS, F-Droid, and Flathub)
 
-wger-project/docker Deployment Architecture // 需要增加细节
-Complete Docker deployment solution
-Deployment Environments
-Production environment configuration (prod)
-Development environment configuration (dev)
-PostgreSQL development environment
-
 Service Components 
 Django application server
+  Running the main wger Django app 
+  Handling HTTP requests and API calls
 nginx: Reverse proxy and static file server  
+  Load balancing for HTTP/HTTPS requests
+  Providing static file services (CSS, JavaScript, images)
 db: PostgreSQL database
+  Primary data storage, including user data, exercise data, and nutritional information
 cache: Redis caching system
+  Conversation storage and temporary data caching
+  API response caching to improve performance
+  Fast access to real-time data and frequently accessed data
 celery_worker: Background task processor
+  Processing background tasks
 celery_beat: Scheduled task coordinator
+  Manage scheduled tasks
+  Perform periodic maintenance and data synchronisation
+  Handle automated system maintenance operations
 
 Key Features
 RESTful design with standard HTTP methods (GET, POST, PUT, DELETE)
