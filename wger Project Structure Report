@@ -149,48 +149,25 @@ Process Manager: Supervisor
 
 Main Component Architecture
 
-wger-project/wger Main Repository Architecture
-Key Modules:
-wger/: Django project root directory
-  Contains the main Django configuration files (settings.py, urls.py, wsgi.py) 
-  Entry point and global configuration for the project
-config/: Project configuration management module
-  Handling Environment Variables and Configuration Files 
-  Managing Configuration Differences Across Environments
-core/: Core module
-  User authentication, rights management 
-  Base model and generic functionality
-exercises/: Exercise management module
-  CRUD operations for exercise database
-  Exercise classification, muscle group, equipment management
-gallery/: Progress photo album
-  Upload and storage management of user progress photos
-gym/: Gym management module
-  Basic information management for gyms
-  Member management and permission allocation
-locale/: Localization module
-  Multilingual support and translation management
-mailer/: Mail system module
-  Email sending function
-manager/: Management functions
-  System administrator functions
-measurements/: Body measurement data
-  Recording and tracking of user physical indicators
-nutrition/: Nutrition management 
-  Food database management (based on Open Food Facts)
-  Meal logging and nutrient calculation
-  Macronutrient goal setting and tracking
-software/: Software information 
-  Application version information and update log
-utils/: Utility functions
-  General-purpose utility functions and helper classes
+System Overview
+wger is built using the Django framework, and the main codebase contains the complete backend services and API system. The project uses an interesting hybrid front-end design: most of the pages use traditional jQuery and Bootstrap techniques, while some of the interactions use React components. the React components are stored in a completely separate repository, and are copied to Django's static files directory via a script after the build, a design that allows for the front and back-ends to be developed independently of each other.
 
-wger-project/flutter Mobile Architecture
-Technical Features:
-Uses the Dart programming language
-Material Design language
-REST API client implementation
-Multi-platform support (Android, iOS, F-Droid, and Flathub)
+Core Module Architecture and Data Flow
+The system is divided into several Django application modules by function. Take the gallery module as an example, it is responsible for managing the complete process of user progress photos: user uploads pictures, the system stores the files, and records the relevant information to the database. manager module handles the management of the training plan, including creating the training plan, arranging the training schedule, and recording the training log. These modules all follow the standard Django structure: the data model defines the data structure, the views handle the business logic, and the URL configuration manages the page routing.
+Modules are connected to each other through data relationships, e.g. a training plan needs to associate user information and exercise data, and a nutrition plan needs to access a food database. The system distributes requests for different functions to the corresponding modules through Django's URL system.
+
+Frontend Integration and Resource Management
+Front-end resources are managed through two parallel systems. Traditional JavaScript libraries (jQuery, Bootstrap, etc.) are managed through package.json and are placed in the yarn directory after build.React components are developed independently and the build files are copied to the react directory.Django templates can be loaded with different front-end resources as needed, and for pages that require complex interactions, they are For pages that require complex interactions, specific container elements are predefined and React components are automatically rendered to these locations after loading.
+
+API and Authentication 
+The system provides a complete REST API interface, with corresponding API endpoints for each functional module for mobile apps and third-party services to call. The APIs use JWT (JSON Web Token) authentication with configurable token lifetimes and support cross-domain access. Front-end components and mobile applications interact with the back-end through these APIs, achieving a clear separation of front-end and back-end.
+
+Supporting Infrastructure 
+core module provides the basic functions of the system, including user authentication, rights management and other core services. config module handles the system configuration parameters. Static files can be stored locally or in the cloud according to the deployment environment. The whole system is designed for containerised deployment, and the installation and maintenance process is simplified by Docker.
+
+Mobile Repository: wger-project/flutter
+Purpose: Cross-platform mobile application built with Flutter, supporting Android, iOS, and other platforms. Provides mobile access to wger services through REST API integration.
+Note: This project focuses primarily on frontend development. Mobile application development is not within the current scope.
 
 Service Components 
 Django application server
@@ -214,8 +191,9 @@ celery_beat: Scheduled task coordinator
 
 Key Features
 RESTful design with standard HTTP methods (GET, POST, PUT, DELETE)
-Authentication-based API access, users only access their own data
+JWT token-based authentication for API access, users only access their own data
 Pagination and filtering for handling efficient data
+Cross-domain access support for third-party integrations
 
 Development Environment
 Option 1 — Docker (recommended for most cases).
