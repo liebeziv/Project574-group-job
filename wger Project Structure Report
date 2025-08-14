@@ -44,7 +44,7 @@ License Information
 
 The project has a multi-license structure:
 
-Application Code: GNU Affero General Public License 3.0 or later.
+Server Components and Mobile Code: GNU Affero General Public License 3.0 or later (AGPL-3.0+). 
 Exercise/Food Data: Creative Commons Attribution Share-Alike 3.0 (CC-BY-SA 3.0).
 Documentation: Creative Commons Attribution Share-Alike (CC-BY-SA 4.0).
 
@@ -120,7 +120,7 @@ Core Technology Stack
 Backend
 Core Framework: Python 3.10-3.13 with Django 5.2.3
 API Endpoints: Django REST Framework 3.16.0
-Data Support: PostgreSQL / SQLite
+Data Support: PostgreSQL (production) / SQLite (development) - configurable choice 
 Caching System: Redis
 Background Processing: Celery 5.5.3
 Web Server: Nginx(reverse proxy)
