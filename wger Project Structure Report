@@ -170,6 +170,9 @@ Purpose: Cross-platform mobile application built with Flutter, supporting Androi
 Note: This project focuses primarily on frontend development. Mobile application development is not within the current scope.
 
 Service Components 
+## System Architecture Diagram
+
+![System Architecture](architecture-diagram.png)
 Django application server
   Running the main wger Django app 
   Handling HTTP requests and API calls
