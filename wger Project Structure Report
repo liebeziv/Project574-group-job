@@ -188,6 +188,38 @@ celery_beat: Scheduled task coordinator
   Manage scheduled tasks
   Perform periodic maintenance and data synchronisation
   Handle automated system maintenance operations
++-----------+
+|   nginx   |
++-----------+
+      |
+      +---> [ static ]
+      +---> [ media  ]
+      |
+      | HTTP requests
+      v
++-----------+
+|    web    |
++-----------+
+      |      |
+      |      +---> [ cache ]
+      |            (redis)
+      |      |
+      |      |
+      |      v
+      +---> [ db ]
+            (postgres)
+
++------------------+
+|  celery_worker   |<--------+
++------------------+         |
+      |    ^                 |
+      |    | Tasks           |
+      |    +-----------------+
+      |                      |
+      v                      |
++--------------+     +--------------+
+| celery_beat  |<--->| celery_worker|
++--------------+     +--------------+
 
 Key Features
 RESTful design with standard HTTP methods (GET, POST, PUT, DELETE)
