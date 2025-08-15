@@ -169,6 +169,12 @@ Mobile Repository: wger-project/flutter
 Purpose: Cross-platform mobile application built with Flutter, supporting Android, iOS, and other platforms. Provides mobile access to wger services through REST API integration.
 Note: This project focuses primarily on frontend development. Mobile application development is not within the current scope.
 
+Data Support
+The system is intended to be deployed via containers. A typical stack includes: nginx → web (Django/DRF via Gunicorn) → PostgreSQL and Redis, plus celery_worker and celery_beat for background/periodic jobs. Persistent volumes hold DB and static/media assets.
+Bootstrapping handoff: Running wger load-fixtures loads the core application fixtures into the DB—e.g., exercises, muscles, equipment, units, languages, permission groups; use load-online-fixtures or sync-ingredients to obtain ingredient data.
+Large data handoff: sync-ingredients can be handed off to Celery (sync-ingredients-async) to avoid blocking the web process; the worker streams/parses sources and commits batched inserts/updates.
+Open Food Facts import: import-off-products imports/updates product data from Open Food Facts, supporting a full dump, daily delta, or Mongo source (see command help for options). Ingredient/product domain data lands in the nutrition app.
+
 Service Components 
 ## System Architecture Diagram
 
