@@ -1,8 +1,30 @@
 Goverenance model
+
   Primary Leadership
+  The primary founder and developer of the wger project is Roland Geider, who is listed on GitHub under the username rolandgeider and is also labelled as the project author on PyPI.Roland Geider plays a role similar to that of a Benevolent Dictator, which is a common governance model in open source projects .
+  
   Core Contributors
+  Helen Sherwood-Taylor (GitHub: @helenst)
+  Tushar Gupta (GitHub: @Tushar-Gupta)
+  Matheus Zorzete Marchiore (GitHub: @marchiore)
+  Yu Yu Aung (GitHub: @max111)
+  Laszlo Ratsko (GitHub: @rlaszlo)
+  
   Decision making process
+  The project follows a typical open source collaboration model: 
+  Contributors are required to open issues for discussion before starting development of new features 
+  Code reviews are conducted through GitHub's Pull Request system 
+  Major decisions are made by the project maintainers, with Roland Geider as the project's founder having the final   decision-making authority 
+  The community can participate in discussions through the Discord server and the GitHub issues
+  
   Community Involvement
+  The project encourages many forms of community participation: 
+  Code contributions 
+  Adding and translating exercise data 
+  Application translation via the Weblate platform 
+  Community discussions on Discord and Mastodon 
+  Bug reports and feature suggestions
+  
 
 Governance Commentary
   Strengths of the Current Model
@@ -11,6 +33,27 @@ Governance Commentary
 
 Project Funding and Commercialization
   Primary Funding Sources
+  The wger project is funded by:
+  GitHub Sponsors: the project accepts donations on the GitHub Sponsors platform, currently there are 3 sponsors 
+  Community Donations: the project website explicitly states that it accepts donations from the community to support server    operating costs 
+  Volunteer Contributions: the project relies heavily on the time and effort input of volunteers
+  The project clearly states that it is free, does not use advertising and does not sell users' personal information.
+ 
   Funding Transparency and Distribution
+  The GitHub Sponsors page shows that donations are primarily used to:
+  Pay server costs 
+  Keep the project active 
+  Support major new feature development
+  Specific details on the distribution of funds and the amount of money were not found in the public profile.
+
   Commercial Independence
+  The project maintains complete commercial independence:
+  Uses AGPL 3+ open source licence 
+  Does not depend on any commercial entity 
+  Can be self-hosted, users have control of their own data 
+  Provides an open REST API
+
   Sustainability Considerations
+  Open source allows community takeover 
+  Self-hosted option reduces reliance on centralised services 
+  Multi-platform availability (Android, iOS, Web, etc.)
