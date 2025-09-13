@@ -28,8 +28,26 @@ Goverenance model
 
 Governance Commentary
   Strengths of the Current Model
+  Based on the experience of several weeks of project participation, the governance model of the wger project shows the        following strengths: 
+  Community quality is high: the quality of the community discussions is very good, the participants are active and often      ask all kinds of questions and needed features, creating a good feedback environment.
+  New contributor friendly: New contributors can easily get started with the project, repositories are clearly                 differentiated, and the deployment process is straightforward. This lowers the barrier to participation and helps attract    new contributors.
+  Good documentation: The project documentation is very clear but not rigid, and does not stick to a fixed format, providing   good guidance for developers.
+  Regular large updates: The project is regularly updated with several previously mentioned and unmentioned bug fixes,         demonstrating the continuous maintenance of the project.
+
   Identified Limitations and Bottlenecks
+  The following major limitations and bottlenecks have been identified through actual participation: 
+  Long response time: the maintainer takes a long time to respond to issues and pull requests, 3 issues submitted by an        individual have not received a response in 2-3 weeks, and pull requests made have not been responded to after 2 weeks.       This may affect the motivation of contributors.
+  Single-point decision-making bottleneck: There seems to be only one person making key decisions, which creates a             significant processing bottleneck, especially when a quick response is required.
+  Lack of Formal Decision Process: There is no formal decision process for adding new features, and many decisions seem to     be based on individual aesthetic criteria rather than a systematic evaluation mechanism.
+  Expertise Gap: The project lacked a number of people with design experience to improve the web interface, which created      limitations in terms of user experience.
+
   Power Imbalances
+  A clear concentration of power in the project was observed: 
+  Highly centralised decision-making: Decision-making power is mainly concentrated in the hands of a few core people, and      most of the time one person (Roland Geider) seems to make the final decision.
+  Differences in contributors' voices: The voices of different contributors are sometimes ignored, and in particular the       suggestions of new or less active contributors may not be heeded in a timely manner.
+  Core group of contributors: Although it is uncertain whether there is a clear distinction between the "inner circle" and     the "outer circle", it has been observed that there is a relatively stable core group of major contributors who are          involved   in every major update.
+  Limited communication channels: The lack of an effective mechanism to balance the views and needs of different               contributors may result in some valuable suggestions being ignored.
+
 
 Project Funding and Commercialization
   Primary Funding Sources
