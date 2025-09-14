@@ -7,15 +7,23 @@ Goverenance model
   Name: Ziqi Lin, Student ID: 1674249, Email: zl354@students.waikato.ac.nz
   Name: Zhengrong Chen, Student ID: 1660321, Email: zc199@students.waikato.ac.nz
 
+  Governance Model
+  Based on contribution guide, contributors lists, and pull requests，we assumed this project use benevolent dictator model.
+  Because Roland Geider, the author of wger project handle most pull request.
+
   Primary Leadership
   The primary founder and developer of the wger project is Roland Geider, who is listed on GitHub under the username rolandgeider and is also labelled as the project author on PyPI.Roland Geider plays a role similar to that of a Benevolent Dictator, which is a common governance model in open source projects .
   
   Core Contributors
-  Helen Sherwood-Taylor (GitHub: @helenst)
-  Tushar Gupta (GitHub: @Tushar-Gupta)
-  Matheus Zorzete Marchiore (GitHub: @marchiore)
-  Yu Yu Aung (GitHub: @max111)
-  Laszlo Ratsko (GitHub: @rlaszlo)
+  backend
+  Peter van der Does (GitHub: @petervanderdoes)
+  Scott Peshak (GitHub: @speshak)
+  Tom Bowyer (GitHub: @ImTheTom)
+
+  frontend
+  Ricky Clautaire SAKA KEUGEU (GitHub: @SakaRicky)
+  Milo Ivir(GitHub: @milotype)
+
   
   Decision making process
   The project follows a typical open source collaboration model: 
