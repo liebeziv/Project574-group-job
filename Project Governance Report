@@ -48,6 +48,7 @@ Governance Commentary
   New contributor friendly: New contributors can easily get started with the project, repositories are clearly differentiated, and the deployment process is straightforward. This lowers the barrier to participation and helps attract new contributors.
   Good documentation: The project documentation is very clear but not rigid, and does not stick to a fixed format, providing good guidance for developers.
   Regular large updates: The project is regularly updated with several previously mentioned and unmentioned bug fixes, demonstrating the continuous maintenance of the project.
+  Reproducible ops: Containerized/scripted dev & prod flows encode the collaboration contract into automation, reducing implicit rules and hidden barriers while lowering coordination costs.
 
   Identified Limitations and Bottlenecks
   The following major limitations and bottlenecks have been identified through actual participation: 
@@ -55,6 +56,7 @@ Governance Commentary
   Single-point decision-making bottleneck: There seems to be only one person making key decisions, which creates a significant processing bottleneck, especially when a quick response is required. The project could slow down significantly if the maintainer is unavailable for some time.
   Lack of Formal Decision Process: There is no formal decision process for adding new features, and many decisions seem to be based on individual aesthetic criteria rather than a systematic evaluation mechanism.
   Expertise Gap: The project lacked a number of people with design experience to improve the web interface, which created limitations in terms of user experience.
+  Scattered decision context: Important trade-offs often live inside individual PR threads and are hard to rediscover.
 
   Power Imbalances
   A clear concentration of power in the project was observed: 
