@@ -29,7 +29,7 @@ Goverenance model
   The project follows a typical open source collaboration model: 
   Contributors are required to open issues for discussion before starting development of new features 
   Code reviews are conducted through GitHub's Pull Request system 
-  Major decisions are made by the project maintainers, with Roland Geider as the project's founder having the final   decision-making authority 
+  Major decisions are made by the project maintainers, with Roland Geider as the project's founder having the final decision-making authority
   The community can participate in discussions through the Discord server and the GitHub issues
   
   Community Involvement
@@ -45,14 +45,14 @@ Governance Commentary
   Strengths of the Current Model
   Based on the experience of several weeks of project participation, the governance model of the wger project shows the  following strengths: 
   Community quality is high: the quality of the community discussions is very good, the participants are active and often ask all kinds of questions and needed features, creating a good feedback environment.
-  New contributor friendly: New contributors can easily get started with the project, repositories are clearly  differentiated, and the deployment process is straightforward. This lowers the barrier to participation and helps attract new contributors.
+  New contributor friendly: New contributors can easily get started with the project, repositories are clearly differentiated, and the deployment process is straightforward. This lowers the barrier to participation and helps attract new contributors.
   Good documentation: The project documentation is very clear but not rigid, and does not stick to a fixed format, providing good guidance for developers.
   Regular large updates: The project is regularly updated with several previously mentioned and unmentioned bug fixes, demonstrating the continuous maintenance of the project.
 
   Identified Limitations and Bottlenecks
   The following major limitations and bottlenecks have been identified through actual participation: 
-  Long response time: the maintainer takes a long time to respond to issues and pull requests, 3 issues submitted by an individual have not received a response in 2-3 weeks, and pull requests made have not been responded to after 2 weeks. This may affect the motivation of contributors.
-  Single-point decision-making bottleneck: There seems to be only one person making key decisions, which creates a significant processing bottleneck, especially when a quick response is required.
+  Long response time: the maintainer takes a long time to respond to issues and pull requests, 3 issues submitted by an individual have not received a response in 2-3 weeks, and pull requests made have not been responded to after 2 weeks. While the entry barrier is low, slow response times negatively affect the enthusiasm of new contributors.
+  Single-point decision-making bottleneck: There seems to be only one person making key decisions, which creates a significant processing bottleneck, especially when a quick response is required. The project could slow down significantly if the maintainer is unavailable for some time.
   Lack of Formal Decision Process: There is no formal decision process for adding new features, and many decisions seem to be based on individual aesthetic criteria rather than a systematic evaluation mechanism.
   Expertise Gap: The project lacked a number of people with design experience to improve the web interface, which created limitations in terms of user experience.
 
@@ -66,12 +66,14 @@ Governance Commentary
 
 Project Funding and Commercialization
   Primary Funding Sources
-  The wger project is funded by:
-  GitHub Sponsors: the project accepts donations on the GitHub Sponsors platform, currently there are 3 sponsors 
-  Community Donations: the project website explicitly states that it accepts donations from the community to support server operating costs 
-  Volunteer Contributions: the project relies heavily on the time and effort input of volunteers
-  The project clearly states that it is free, does not use advertising and does not sell users' personal information.
- 
+  The wger project is a free and open-source fitness and nutrition manager. The project explicitly states that it will remain free, does not use advertising, and does not sell users’ personal information, making it clearly non-profit.
+  Community Donations: The project accepts donations to support server operating costs.
+  Funding channels include:
+  GitHub Sponsors: currently 1 active and 3 past sponsors (amounts not disclosed).
+  Liberapay: about €3.92 per week from 2 patrons (~€203 per year).
+  Buy Me a Coffee: 6 supporters donated 18 coffees (~€90).
+  Volunteer Contributions: the project relies heavily on the time and effort input of volunteers.
+
   Funding Transparency and Distribution
   The GitHub Sponsors page shows that donations are primarily used to:
   Pay server costs 
