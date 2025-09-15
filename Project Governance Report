@@ -1,3 +1,10 @@
+Meeting 记录
+Governance reports ： 
+1.需要增加的内容：我们觉得这个model 好还是不好，并且说出理由
+2.需要修改的内容： 列出两种情况的core contributors ，一是文档里的authors ，二是 根据GitHub commit 排行  （完成）
+3. 可以增加的内容： 1️⃣翻译进度 2️⃣ decision making 这里可以补充是否有哪些契机做出决定
+
+
 Goverenance model
 
   Group Member Information:
@@ -15,6 +22,9 @@ Goverenance model
   The primary founder and developer of the wger project is Roland Geider, who is listed on GitHub under the username rolandgeider and is also labelled as the project author on PyPI.Roland Geider plays a role similar to that of a Benevolent Dictator, which is a common governance model in open source projects .
   
   Core Contributors
+  Core contributors can be identified through two approaches:
+
+  Analysis of recent contribution activity in the past 6 months shows the following active contributors ranked by contribution frequency:
   backend
   Peter van der Does (GitHub: @petervanderdoes)
   Scott Peshak (GitHub: @speshak)
@@ -24,6 +34,13 @@ Goverenance model
   Ricky Clautaire SAKA KEUGEU (GitHub: @SakaRicky)
   Milo Ivir(GitHub: @milotype)
 
+  According to the project's official documentation, the following individuals are recognized as core contributors to the project's development:
+  Roland Geider (GitHub: @rolandgeider) - Project founder and primary maintainer
+  Helen Sherwood-Taylor (GitHub: @helenst)
+  Tushar Gupta (GitHub: @Tushar-Gupta)
+  Matheus Zorzete Marchiore (GitHub: @marchiore)
+  Yu Yu Aung (GitHub: @max111)
+  Laszlo Ratsko (GitHub: @rlaszlo)
   
   Decision making process
   The project follows a typical open source collaboration model: 
