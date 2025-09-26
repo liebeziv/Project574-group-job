@@ -28,6 +28,7 @@ Made a standard PrecisionToggleButton component that looks and works the same ev
 issue 2: Add Meal Form Time Field Not Editable
 #1115 In wger-project/react;
 https://github.com/simin-ch/react/tree/fix-timepicker-bug
+https://github.com/wger-project/react/pull/1116
 Problem Identified:
 In the "Add Meal" form, the time field was not properly editable or selectable. Users couldn't modify the time when adding or editing meals, which significantly impacted the meal logging functionality.
 Problem Identified:
