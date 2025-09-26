@@ -15,6 +15,9 @@ Goverenance model
   The primary founder and developer of the wger project is Roland Geider, who is listed on GitHub under the username rolandgeider and is also labelled as the project author on PyPI.Roland Geider plays a role similar to that of a Benevolent Dictator, which is a common governance model in open source projects .
   
   Core Contributors
+  Core contributors can be identified through two approaches:
+
+  Analysis of recent contribution activity in the past 6 months shows the following active contributors ranked by contribution frequency:
   backend
   Peter van der Does (GitHub: @petervanderdoes)
   Scott Peshak (GitHub: @speshak)
@@ -24,6 +27,13 @@ Goverenance model
   Ricky Clautaire SAKA KEUGEU (GitHub: @SakaRicky)
   Milo Ivir(GitHub: @milotype)
 
+  According to the project's official documentation, the following individuals are recognized as core contributors to the project's development:
+  Roland Geider (GitHub: @rolandgeider) - Project founder and primary maintainer
+  Helen Sherwood-Taylor (GitHub: @helenst)
+  Tushar Gupta (GitHub: @Tushar-Gupta)
+  Matheus Zorzete Marchiore (GitHub: @marchiore)
+  Yu Yu Aung (GitHub: @max111)
+  Laszlo Ratsko (GitHub: @rlaszlo)
   
   Decision making process
   The project follows a typical open source collaboration model: 
@@ -31,13 +41,15 @@ Goverenance model
   Code reviews are conducted through GitHub's Pull Request system 
   Major decisions are made by the project maintainers, with Roland Geider as the project's founder having the final decision-making authority
   The community can participate in discussions through the Discord server and the GitHub issues
+
+  Based on our limited observation period, it is difficult to identify clear patterns regarding when Roland Geider directly intervenes in decision-making processes. Further long-term observation would be needed to establish definitive triggers for his involvement.
   
   Community Involvement
   The project encourages many forms of community participation: 
-  Code contributions 
-  Adding and translating exercise data 
-  Application translation via the Weblate platform 
-  Community discussions on Discord and Mastodon 
+  Code contributions
+  Adding and translating exercise data
+  Application translation via the Weblate platform - currently supports 38 languages with community-driven translation progress averaging 66-74% completion across different components
+  Community discussions on Discord and Mastodon
   Bug reports and feature suggestions
   
 
@@ -48,6 +60,7 @@ Governance Commentary
   New contributor friendly: New contributors can easily get started with the project, repositories are clearly differentiated, and the deployment process is straightforward. This lowers the barrier to participation and helps attract new contributors.
   Good documentation: The project documentation is very clear but not rigid, and does not stick to a fixed format, providing good guidance for developers.
   Regular large updates: The project is regularly updated with several previously mentioned and unmentioned bug fixes, demonstrating the continuous maintenance of the project.
+  Reproducible ops: Containerized/scripted dev & prod flows encode the collaboration contract into automation, reducing implicit rules and hidden barriers while lowering coordination costs.
 
   Identified Limitations and Bottlenecks
   The following major limitations and bottlenecks have been identified through actual participation: 
@@ -55,6 +68,7 @@ Governance Commentary
   Single-point decision-making bottleneck: There seems to be only one person making key decisions, which creates a significant processing bottleneck, especially when a quick response is required. The project could slow down significantly if the maintainer is unavailable for some time.
   Lack of Formal Decision Process: There is no formal decision process for adding new features, and many decisions seem to be based on individual aesthetic criteria rather than a systematic evaluation mechanism.
   Expertise Gap: The project lacked a number of people with design experience to improve the web interface, which created limitations in terms of user experience.
+  Scattered decision context: Important trade-offs often live inside individual PR threads and are hard to rediscover.
 
   Power Imbalances
   A clear concentration of power in the project was observed: 
@@ -70,8 +84,8 @@ Project Funding and Commercialization
   Community Donations: The project accepts donations to support server operating costs.
   Funding channels include:
   GitHub Sponsors: currently 1 active and 3 past sponsors (amounts not disclosed).
-  Liberapay: about €3.92 per week from 2 patrons (~€203 per year).
-  Buy Me a Coffee: 6 supporters donated 18 coffees (~€90).
+  Liberapay: About €3.92 per week from 2 patrons (~€203 per year)
+  Buy Me a Coffee: 6 supporters donated 18 coffees
   Volunteer Contributions: the project relies heavily on the time and effort input of volunteers.
 
   Funding Transparency and Distribution
@@ -92,3 +106,25 @@ Project Funding and Commercialization
   Open source allows community takeover 
   Self-hosted option reduces reliance on centralised services 
   Multi-platform availability (Android, iOS, Web, etc.)
+
+  Overall Assessment of the Governance Model
+  Based on our analysis of the wger project's benevolent dictator governance model, the evidence presents a mixed assessment:
+  The model demonstrates effectiveness in certain areas:
+  
+  The project maintains consistent development momentum with regular updates and bug fixes
+  New contributors can successfully join the project due to clear documentation and containerized setup processes
+  The project has sustained operation for multiple years under this leadership structure
+  Community engagement remains active across multiple platforms (Discord, GitHub, Weblate)
+  
+  However, significant operational challenges are evident:
+  
+  Response times to contributions (2-3 weeks for issues and pull requests) create barriers to contributor engagement
+  Decision-making bottlenecks occur when the primary maintainer is unavailable
+  The absence of formal decision-making processes leads to inconsistent evaluation criteria for new features
+  Limited expertise in certain areas (particularly UI/UX design) constrains development potential
+
+  Assessment Conclusion:
+  The benevolent dictator model appears functionally adequate but requiring improvement for the wger project because it has demonstrated both operational effectiveness and significant scalability limitations. While the model has enabled sustained project development over multiple years, consistent       bug fixes and feature updates, successful onboarding of new contributors, and maintenance of active community engagement across 38 languages, the documented response delays (2-3 weeks), single-point decision bottlenecks, and absence of formal evaluation processes suggest that the project would       benefit from implementing distributed decision-making authority and formalized contribution review procedures to ensure long-term sustainability and contributor retention.
+
+
+  
