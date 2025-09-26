@@ -1,0 +1,41 @@
+issue 1：Language switcher only shows part of the list on smaller screens
+Branch: https://github.com/Carner-Lin/wger/tree/language-dropdown
+Issue: wger-project/wger #2040
+PR: https://github.com/wger-project/wger/pull/2042
+Bug:
+The language dropdown in the footer could extend beyond the viewport on phones or narrow windows, so the top entries became unreachable. User can not scroll inside the dropdown to reach hidden languages.
+Root cause:
+1. The dropdown had no max height or scrolling behavior; its height grew with content.
+2. The menu relied on default Bootstrap styles; on small screens the absolute/fixed positioning didn’t constrain the panel within the viewport.
+What changes：
+I added a specific CSS class to the dropdown <ul> in the template and introduced a lightweight stylesheet that caps the menu height to a viewport-relative value (max-height: 60vh) and enables vertical scrolling (overflow-y: auto).
+I also constrained the width to avoid horizontal overflow and applied overscroll-behavior: contain so that scroll gestures are captured by the menu instead of leaking to the page behind it.
+With these adjustments, the menu now always remains fully usable on small screens: all languages are accessible by scrolling inside the dropdown.
+
+issue 2：The height spinner in user preferences can be set below 0
+Branch: https://github.com/Carner-Lin/wger/tree/Height-limit
+Issue: no report
+PR: https://github.com/wger-project/wger/pull/2030
+Bug:
+The "Height (cm)" input allowed negative values via spinner in user preferences.
+Root cause:
+1. Model lacked a server-side validator to forbid negatives.
+2. Form widget missed HTML constraints (min="0"), so the browser spinner could go below 0.
+What changes：
+At the form layer, I set type="number", step="1", and min="0", which makes the spinner stop at zero and prompts a native “must be ≥ 0” message when the user types a negative number.
+Negative numbers are now prohibited for "height" in personal profile.
+
+issue 3：Layout misalignment causes thumbnails to obscure text
+Branch URL: https://github.com/Carner-Lin/react/tree/routine-layout-fixes
+Issue: wger-project/react #1120
+PR: https://github.com/wger-project/react/pull/1121
+Bug:
+On the routine page, as the window width gradually decreases, the distance between the exercise thumbnail and the text will also gradually decrease, causing it to obscure the text.
+Root cause:
+1. The left "thumbnail column" wasn’t fixed; under flex wrapping it shrunk or reflowed, allowing the image to drift.
+2. The right "text column" kept its minimum content width, so it didn’t shrink, effectively pushing the image.
+What changes：
+I made the row a non-wrapping flex/grid container so the image and text stay on the same line and gave the left column a fixed, non-shrinking width.
+I also allowed the right column to actually shrink and wrap by explicitly permitting width compression, so long titles wrap within their own column instead of displacing the image.
+And then I kept multiple thumbnails vertically stacked with a small, consistent gap for visual rhythm..
+After the change, the thumbnail column remains fixed at the left across breakpoints, the text wraps naturally within its area, and the overlap/covering issue no longer occurs on phones or when the desktop window is resized.
