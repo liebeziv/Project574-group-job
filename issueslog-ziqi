@@ -3,7 +3,7 @@ Branch: https://github.com/Carner-Lin/wger/tree/language-dropdown
 Issue: wger-project/wger #2040
 PR: https://github.com/wger-project/wger/pull/2042
 Bug:
-The language dropdown in the footer could extend beyond the viewport on phones or narrow windows, so the top entries became unreachable. User can not scroll inside the dropdown to reach hidden languages.
+The language dropdown in the footer could extend beyond the viewport on small windows, so the top entries became unreachable. User can not scroll inside the dropdown to reach hidden languages.
 Root cause:
 1. The dropdown had no max height or scrolling behavior; its height grew with content.
 2. The menu relied on default Bootstrap styles; on small screens the absolute/fixed positioning didn’t constrain the panel within the viewport.
