@@ -1,4 +1,6 @@
 issue 1: Nutritional Value Table Calculation Inaccuracy Due to Rounding
+#1108 In wger-project/react;
+https://github.com/simin-ch/react/tree/nutrition-precision-feature
 Problem Identified:
 The nutritional value tables were displaying inaccurate total values due to premature rounding. The root cause was in `src/utils/numbers.ts` where the `numberUnitLocale` function had `maximumFractionDigits: 0`, which forced all nutritional values to be rounded to integers before calculations. This caused the sum totals to be mathematically incorrect when individual ingredients had fractional nutritional values.
 Root Cause Analysis:
@@ -24,9 +26,11 @@ Phase 6: Create Reusable Button
 Made a standard PrecisionToggleButton component that looks and works the same everywhere. Added the precision control to more places like ingredient details and improved the help text.
 
 issue 2: Add Meal Form Time Field Not Editable
+#1115 In wger-project/react;
+https://github.com/simin-ch/react/tree/fix-timepicker-bug
 Problem Identified:
 In the "Add Meal" form, the time field was not properly editable or selectable. Users couldn't modify the time when adding or editing meals, which significantly impacted the meal logging functionality.
-Root Cause Analysis:
+Problem Identified:
 The TimePicker component in MealForm.tsx was receiving a Luxon DateTime object but the onChange handler was directly passing the Luxon DateTime object to Formik, which expects a JavaScript Date object. This type mismatch prevented proper form state updates.
 Solution:
 Convert the returned Luxon DateTime back to a JS Date before saving into Formik.
