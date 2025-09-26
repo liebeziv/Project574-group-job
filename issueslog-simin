@@ -26,7 +26,7 @@ Made a standard PrecisionToggleButton component that looks and works the same ev
 issue 2: Add Meal Form Time Field Not Editable
 Problem Identified:
 In the "Add Meal" form, the time field was not properly editable or selectable. Users couldn't modify the time when adding or editing meals, which significantly impacted the meal logging functionality.
-Problem Identified:
+Root Cause Analysis:
 The TimePicker component in MealForm.tsx was receiving a Luxon DateTime object but the onChange handler was directly passing the Luxon DateTime object to Formik, which expects a JavaScript Date object. This type mismatch prevented proper form state updates.
 Solution:
 Convert the returned Luxon DateTime back to a JS Date before saving into Formik.
