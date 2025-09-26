@@ -1,0 +1,32 @@
+issue 1: Nutritional Value Table Calculation Inaccuracy Due to Rounding
+Problem Identified:
+The nutritional value tables were displaying inaccurate total values due to premature rounding. The root cause was in `src/utils/numbers.ts` where the `numberUnitLocale` function had `maximumFractionDigits: 0`, which forced all nutritional values to be rounded to integers before calculations. This caused the sum totals to be mathematically incorrect when individual ingredients had fractional nutritional values.
+Root Cause Analysis:
+1. The `numberGramLocale` function called `numberUnitLocale` with hardcoded `maximumFractionDigits: 0`. This configuration forced all nutritional values to be displayed as integers (rounded to whole numbers), while the actual calculations were performed using the precise stored values.
+2. The nutritional data is actually stored with 3 decimal places precision in the database.
+Solution:
+Instead of fixing the rounding issue by simply allowing decimals everywhere, I implemented a user-controlled precision toggle feature that provides:
+1. Users can choose between integer display  or one decimal display
+2. When precision is enabled, both individual values and totals show the same level of detail
+3. Maintains clean integer display as default while offering precision when needed
+Implementation Details:
+Phase 1: Fix Number Display Function
+Changed the numberGramLocale function in src/utils/numbers.ts to accept a precision setting. Removed the hardcoded maximumFractionDigits: 0 and created a new numberConfigurable function to show decimal places when needed.
+Phase 2: Add Toggle to Tables
+Added precision toggle buttons to nutrition value tables. Used React's useState to control whether to show whole numbers or decimals. Added simple toggle buttons with icons and help text.
+Phase 3: Create Global Settings
+Built a global system using React Context to save precision settings across the whole app. Added localStorage to remember user choices between browser sessions.
+Phase 4: Connect All Components
+Updated all nutrition tables to use the global precision setting instead of their own local settings. Used useNutritionPrecision hook to share the same precision choice everywhere.
+Phase 5: Add Controls to Main Pages
+Wrapped the React app with the precision provider and added toggle buttons to main nutrition pages. Made sure all nutrition displays use the same precision setting.
+Phase 6: Create Reusable Button
+Made a standard PrecisionToggleButton component that looks and works the same everywhere. Added the precision control to more places like ingredient details and improved the help text.
+
+issue 2: Add Meal Form Time Field Not Editable
+Problem Identified:
+In the "Add Meal" form, the time field was not properly editable or selectable. Users couldn't modify the time when adding or editing meals, which significantly impacted the meal logging functionality.
+Problem Identified:
+The TimePicker component in MealForm.tsx was receiving a Luxon DateTime object but the onChange handler was directly passing the Luxon DateTime object to Formik, which expects a JavaScript Date object. This type mismatch prevented proper form state updates.
+Solution:
+Convert the returned Luxon DateTime back to a JS Date before saving into Formik.
