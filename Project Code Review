@@ -48,5 +48,5 @@ Repository: https://github.com/Carner-Lin/react/tree/routine-layout-fixes
 Pull Request: https://github.com/wger-project/react/pull/1121
 Problem: On the routine page, as the viewport narrows the exercise thumbnail drifted and visually obscured the text.
 Actual development process: Identified that the left “thumbnail column” was allowed to shrink/reflow under flex wrapping, while the right “text column” resisted shrinking due to min-content behavior. Updated the row to a non-wrapping layout so image and text stay aligned; fixed a non-shrinking width for the thumbnail column; allowed the text column to wrap within its own area; and stacked multiple thumbnails vertically with a small, consistent gap. Validated across common breakpoints and on mobile to ensure no overlap and stable rhythm.
-Maintainer interaction: Submitted targeted layout changes with screenshots at multiple widths; responded to nit comments about naming and kept the diff minimal.
-Outcome: PR submitted – pending maintainer decision.
+Maintainer interaction: Submitted targeted layout changes with screenshot; Author did a quick review.
+Outcome: Merged — pending next production deploy (not live yet).
