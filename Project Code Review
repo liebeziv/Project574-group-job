@@ -98,20 +98,7 @@ Actual development process:
 Initial design attempted to make save button flash red after click, using CSS animation for pulse effect, but testing found effect too strong.
 Iterative improvements based on maintainer feedback:
 
-First revision: Removed red flashing, changed to disable button
-Second revision: Added gentler visual cues
-
-Disable button during query execution
-Show green checkmark (✅) on success
-Use project's existing FormQueryErrors component for errors
-
-
-Third revision: Refined interaction details
-
-Added debounce mechanism to avoid frequent requests
-Success prompt displays for 2 seconds then auto-disappears
-Ensure error messages are clear and understandable
-
+The initial design attempted to make the save button turn red and blink when clicked, using CSS animation to achieve a pulsing effect, but testing revealed that the effect was too strong and could cause users to mistake it for an error message. Based on the feedback suggestions from the maintainers, a more moderate visual feedback scheme was implemented: disable the button to prevent repeated clicks when the query is running, display a green tick mark (✅) for 2 seconds after success, and use the project's existing FormQueryErrors component to display an error message when it fails. At the same time, a 300ms anti-shaking mechanism was added to avoid frequent requests and ensure that all error messages are clear and easy to understand.
 
 
 Maintainer interaction: Maintainer @rolandgeider commented: "Adding some feedback is definitely a good idea, the feature itself would need to be added to ExerciseSearchForm" but noted red flashing effect was "too much". Adjusted UI implementation three times according to project specifications.
