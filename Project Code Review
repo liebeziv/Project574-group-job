@@ -4,42 +4,197 @@ Name: Simin Cheng, Student ID: 1663732, Email: sc1040@students.waikato.ac.nz
 Name: Bai Lu, Student ID: 1671298, Email: ys677@students.waikato.ac.nz
 Name: Ziqi Lin, Student ID: 1674249, Email: zl354@students.waikato.ac.nz
 Name: Zhengrong Chen, Student ID: 1660321, Email: zc199@students.waikato.ac.nz
-1. Project Review1.1 Systematic Issues IdentifiedIssue 1 - WorkoutLog Uses Naive TimestampLocation: wger/manager/models/log.py:43Risk: default=datetime.datetime.now returns a naive datetime. With USE_TZ=True, all log entries are stored in server time, so users in other time zones observe incorrect ordering and "future" timestamps. This undermines the reliability of workout histories and any analytical dashboards.Recommended fix: Import timezone from Django and switch to default=timezone.now. Also audit helper scripts such as wger/tasks.py to ensure no other naive datetimes remain.Expected impact: Ensures workout logs reflect true chronological order for all regions, which is critical for international users and downstream analytics (e.g., weekly summaries, reminder triggers).Issue 2 - WorkoutLog.str Always Displays "kg"Location: wger/manager/models/log.py:128Risk: The string representation concatenates "kg" even when the stored unit is pounds, kilometers per hour, etc. Administrators reviewing logs in Django admin or CSV exports see values labelled "kg" regardless of the real unit, potentially leading to incorrect coaching decisions.Recommended fix: Derive the unit label from self.weight_unit (or fall back to WeightUnit.name). Provide graceful placeholders ("—") when weight is missing.Expected impact: Accurate, unit-aware strings make logs trustworthy for both metric and imperial users and reduce support tickets related to mismatched units.Issue 3 - Day Lacks (routine, order) Unique ConstraintLocation: wger/manager/models/day.py:30Risk: Although order has an index, the database allows duplicate day orders within the same routine. If two days share the same order, downstream code (API serializers, front-end renderers) receives an unpredictable sequence.Recommended fix: Introduce models.UniqueConstraint(fields=['routine', 'order'], name='unique_day_order_per_routine') in a migration, and ship a one-off data cleaner that picks the lowest unused order for duplicates.Expected impact: Guarantees deterministic ordering at the persistence layer, which simplifies front-end logic and prevents schedule confusion.Issue 4 - RepetitionUnit Relies on Magic IDsLocation: wger/core/models/rep_unit.py:41 (return self.id == 1)Risk: Logic assumes ID 1 always maps to "Repetitions". If fixtures or database migrations ever reorder IDs (e.g., when seeding a new environment), all conditional paths depending on this check break silently.Recommended fix: Add an immutable code (e.g., "repetitions", "minutes") to RepetitionUnit, populate it in a migration, and compare against this semantic field. Alternatively, expose constants from manager.consts.Expected impact: Removes a fragile dependency on fixture order, improves readability, and supports future units (calories, distance) without hidden assumptions.Issue 5 - Routine.dayDataCurrentIteration Lacks Front-end SortingLocation: wger-react/src/components/WorkoutRoutines/models/Routine.tsRisk: The getter filters by iteration but returns items in the same order as received from the API. When the backend returns days in an unexpected order (e.g., locale-specific start day), the UI mirrors that incorrect sequence, producing the exact bug reported in Issue #1980 (e.g., Sunday appearing first).Recommended fix: Copy the filtered array and sort by day.order, then by date and day.id as tiebreakers. Add a unit test to verify ordering for mixed data sets. Note in the contribution guide that front-end fixes must land in the React source repository.Expected impact: Delivers predictable weekday ordering for all clients, ensures future contributors can easily audit and extend the logic, and prevents regressions in newly built bundles.1.2 Positive Design ChoicesMeta-ordering and Indexes in ModelsExample: Day.Meta.ordering = ['order'] with order indexed.Benefit: Databases return sorted rows directly, reducing ORM overhead. This is a best practice for read-heavy workloads (e.g., dashboards). Particularly in PostgreSQL, B-tree indexes can directly support ORDER BY operations, avoiding additional sorting steps.Developer impact: Query code remains concise—no repetitive order_by(). For instance, Day.objects.filter(routine=r) automatically returns sorted results without needing Day.objects.filter(routine=r).order_by('order'), reducing error potential. Performance remains consistent even with large routines.Centralized React View HandlingExample: wger/core/views/react.ReactView encapsulates authentication checks, template selection, and Shadow DOM exceptions.Benefit: Enforces DRY principles and standardizes the bootstrap process for every React page. All React pages share the same security checks, CSRF token handling, and initial data injection logic. When authentication logic needs modification or new security headers are added, only one place needs updating.Developer impact: Onboarding new screens requires less boilerplate. New developers only need to inherit ReactView and override get_context_data() to create new pages, without understanding the underlying Shadow DOM compatibility handling. Bugs in the base view fix all consumers simultaneously.Use of Dataclasses for Template-ready DataExample: wger/manager/dataclasses.SlotData aggregates data for templates.Benefit: Separates data marshalling from presentation, making the Python layer responsible for shape transformations. Dataclasses provide automatic __init__, __repr__, and __eq__ methods, reducing boilerplate. Type annotations make data structures clear, and IDEs can provide accurate autocomplete.Developer impact: Templates remain clean—using {{ slot.start_time }} instead of {{ slot.0.1.time }} greatly improves readability. View tests can validate structure via dataclasses. Unit tests can directly construct SlotData instances for testing without mocking complex model relationships. IDE type hints remain accurate throughout the development process.2. Contribution SummaryIssue #1980 - Fix Workout Day Ordering Issue [Zhengrong Chen]
+
+1. Project Review
+1.1 Systematic Issues Identified
+Issue 1 - WorkoutLog Uses Naive Timestamp
+Location: wger/manager/models/log.py:53
+Risk: default=datetime.datetime.now returns a naive datetime. With USE_TZ=True in the default configuration, all log entries are stored in server time, causing users in other time zones to see disordered or "future" timestamps, undermining the reliability of training history and analytical dashboards.
+Recommended fix: Import timezone from Django and change to default=timezone.now. Also audit utility scripts (e.g., wger/tasks.py) for any remaining naive datetimes.
+Expected impact: Ensures training logs accurately reflect chronological order across all regions, which is critical for international users and downstream analytics such as weekly reports and reminders.
+Issue 2 - WorkoutLog.str Always Displays "kg"
+Location: wger/manager/models/log.py:226
+Risk: String representation always concatenates "kg" regardless of actual unit. Administrators viewing logs in Django admin or exporting CSVs will be misled, potentially making incorrect coaching decisions.
+Recommended fix: Generate unit labels based on self.weight_unit (with fallback to WeightUnit.name), and display friendly placeholders (e.g., "—") when weight is missing.
+Expected impact: Provides accurate unit display for both metric and imperial users, reducing support tickets related to unit mismatches.
+Issue 3 - Day Lacks (routine, order) Unique Constraint
+Location: wger/manager/models/day.py:45
+Risk: Although order has an index, the database allows duplicate orders within the same routine; once duplicates occur, downstream serialization and frontend rendering receive unpredictable sequences.
+Recommended fix: Add models.UniqueConstraint(fields=['routine', 'order'], name='unique_day_order_per_routine') in a migration, and provide a one-time data cleaner to assign unused orders to duplicates.
+Expected impact: Guarantees deterministic ordering at the persistence layer, simplifying frontend logic and completely avoiding schedule confusion.
+Issue 4 - RepetitionUnit Relies on Magic ID
+Location: wger/core/models/rep_unit.py:60
+Risk: The property is_repetition uses self.id == 1 to determine "Repetitions". If fixtures or migrations change the primary key order, such checks will fail silently.
+Recommended fix: Add an immutable code to RepetitionUnit (e.g., "repetitions", "minutes"), populate it in a migration and use this field for checks; or centrally expose constants in manager.consts.
+Expected impact: Eliminates fragile dependency on fixture order, improves readability, and lays foundation for future units (calories, distance, etc.).
+Issue 5 - Routine.dayDataCurrentIteration Lacks Frontend Sorting
+Location: wger-react/src/components/WorkoutRoutines/models/Routine.ts
+Risk: The getter filters by iteration then directly returns API order. If the backend returns unexpected order (based on language or start day), the UI replicates that order, exactly the "Sunday always first" problem encountered in Issue #1980.
+Recommended fix: Copy the filtered array and sort by day.order, with date and day.id as tiebreakers. Add unit tests to verify mixed dataset sorting; emphasize in contribution guidelines that frontend fixes must be submitted to the React source repository.
+Expected impact: All clients receive predictable workout day ordering, future contributors can easily audit and extend logic, and prevents regressions in new builds.
+1.2 Positive Design Choices
+Meta Ordering and Indexes in Models
+Example: Day.Meta.ordering = ['order'] with order indexed.
+Benefits: Database directly returns sorted rows, reducing ORM overhead. This is a best practice for read-heavy workloads (e.g., dashboards). Particularly in PostgreSQL, B-tree indexes can directly support ORDER BY operations, avoiding additional sorting steps.
+Developer impact: Query code remains concise—no repetitive order_by(). For example, Day.objects.filter(routine=r) automatically returns sorted results without needing Day.objects.filter(routine=r).order_by('order'), reducing error potential. Performance remains consistent even with large routines.
+Centralized React View Handling
+Example: wger/core/views/react.ReactView encapsulates authentication checks, template selection, and Shadow DOM exceptions.
+Benefits: Enforces DRY principle and standardizes the bootstrap process for every React page. All React pages share the same security checks, CSRF token handling, and initial data injection logic. When authentication logic needs modification or new security headers are added, only one place needs updating.
+Developer impact: Introducing new screens requires less boilerplate. New developers only need to inherit ReactView and override get_context_data() to create new pages, without understanding the underlying Shadow DOM compatibility handling. Bugs in the base view fix all consumers simultaneously.
+Using Dataclasses for Template-ready Data
+Example: wger/manager/dataclasses.SlotData aggregates data for templates.
+Benefits: Separates data marshalling from presentation, making the Python layer responsible for shape transformations. Dataclasses provide automatic __init__, __repr__, and __eq__ methods, reducing boilerplate. Type annotations make data structures clear, and IDEs can provide accurate autocomplete.
+Developer impact: Templates remain clean—using {{ slot.start_time }} instead of {{ slot.0.1.time }} greatly improves readability. View tests can validate structure via dataclasses. Unit tests can directly construct SlotData instances for testing without mocking complex model relationships. IDE type hints remain accurate throughout development.
+2. Contribution Summary
+Issue #1980 - Fix Workout Day Ordering Issue [Zhengrong Chen]
 
 Repository: https://github.com/liebeziv/wger/tree/fix-training-day-order
 Pull Request: https://github.com/wger-project/wger/pull/2050
-Problem: Training days occasionally rendered out of order (Monday after Wednesday), especially for locales where the backend returns Sunday as first element.Actual development process: Initially thought it was a CSS issue, tried adjusting display order with CSS order property, but realized this was only visual modification—the data order itself was wrong. Then considered fixing at the backend API level, but this required modifying multiple endpoints with too large an impact. Next attempted directly modifying wger/core/static/react/main.js, finding the dayDataCurrentIteration location in the compressed code and adding .slice().sort(...) logic. Local testing indeed solved the problem, excitedly submitted PR #2050. It was rejected—maintainer pointed out shouldn't modify compiled files. Only then realized React code has a separate source repository. After finding wger-react repository, reimplemented in src/components/WorkoutRoutines/models/Routine.ts, designing a stable comparator: first by day.order, then by date, finally by day.id as tiebreaker. This process took two weeks, mainly wasted understanding the project's build pipeline.Maintainer interaction: After submitting PR #2050, received no direct maintainer reply. From closed PR status, inferred the issue was modifying compiled bundle rather than source code. Currently reimplementing fix in React source repository.Outcome: Rejected - fix reworked in source repo with pending PR.Issue #2019 - Implement Calories Burned Feature [Zhengrong Chen]
+
+Problem: Workout days occasionally render out of order (Monday after Wednesday), especially for locales where the backend returns Sunday as the first element.
+Actual development process: Initially thought it was a CSS issue, tried adjusting display order with CSS order property, but realized this was only visual modification—the data order itself was wrong. Then considered fixing at the backend API level, but this required modifying multiple endpoints with too large an impact. Next attempted directly modifying wger/core/static/react/main.js, finding the dayDataCurrentIteration location in the compressed code and adding .slice().sort(...) logic. Local testing indeed solved the problem, excitedly submitted PR #2050. It was rejected—maintainer pointed out shouldn't modify compiled files. Only then realized React code has a separate source repository. After finding wger-react repository, reimplemented in src/components/WorkoutRoutines/models/Routine.ts, designing a stable comparator: first by day.order, then by date, finally by day.id as tiebreaker. This process took two weeks, mainly wasted understanding the project's build pipeline.
+Maintainer interaction: After submitting PR #2050, received no direct maintainer reply. PR was closed, the issue was modifying the compiled bundle file rather than source code. Currently reimplementing the fix in the React source repository.
+Outcome: Rejected - fix reworked in source repo with pending PR.
+Issue #2019 - Implement Calories Burned Feature [Zhengrong Chen]
 
 Repository: https://github.com/liebeziv/wger/tree/feature-calories
 Pull Request: Not yet submitted
-Problem: Users want workouts to auto-compute calories and sync with nutrition plans.Actual development process: Started thinking it was simple—just add a "Calories" unit to RepetitionUnit table. Added REP_UNIT_CALORIES = 3 in wger/manager/consts.py, then wrote migration script to insert new record. Testing revealed the problem: calories aren't fixed values like weight, same exercise burns differently for different people. Started redesigning, realized need: an ExerciseCalorieData model storing base burn rates for each exercise; calculations adjusted by user weight and age; integration with nutrition plans. Wrote extensive design documentation, using bilingual (fearing unclear expression) description in the issue. Maintainer replied automatic calculation too complex, accuracy hard to guarantee, suggested considering smartwatch sync. Now stuck—have model definitions and migration scripts locally, but haven't figured out core calculation service. Considering whether to implement simple version first (manual calorie input), then gradually add automatic calculation.Maintainer interaction: Proposed complete implementation plan in issue #2019. Maintainer @rolandgeider replied: "adding kcal as units for workouts is a good idea" but expressed concerns about automatic calculations, noting need to add data for each exercise in database and uncertainty about accuracy. He suggested considering smartwatch sync (issue #618) as more precise alternative.Outcome: In development - backend models and migration scaffold exist locally.UI Improvement Contributions [Bai Lu]PR #1105 - Add Guiding Arrow to Empty Overview
 
-Repository: https://github.com/vilanell000/react
+Problem: Users want workouts to auto-compute calories and sync with nutrition plans.
+Actual development process: Started thinking it was simple—just add a "Calories" unit to RepetitionUnit table. Added REP_UNIT_CALORIES = 3 in wger/manager/consts.py, then wrote migration script to insert new record. Testing revealed the problem: calories aren't fixed values like weight, same exercise burns differently for different people. Started redesigning, realized need: an ExerciseCalorieData model storing base burn rates for each exercise; calculations adjusted by user weight and age; integration with nutrition plans. Wrote extensive design documentation, using bilingual (fearing unclear expression) description in the issue. Maintainer replied automatic calculation too complex, accuracy hard to guarantee, suggested considering smartwatch sync. Now stuck—have model definitions and migration scripts locally, but haven't figured out core calculation service. Considering whether to implement simple version first (manual calorie input), then gradually add automatic calculation.
+Maintainer interaction: Proposed complete implementation plan in issue #2019. Maintainer @rolandgeider replied: "adding kcal as units for workouts is a good idea" but expressed concerns about automatic calculations, noting need to add data for each exercise in database and uncertainty about accuracy. He suggested considering smartwatch sync (issue #618) as more precise alternative.
+Outcome: In development - backend models and migration scaffold exist locally.
+Issue #1105 - Add Guide Arrow for Empty State Page [Bai Lu]
+
 Pull Request: https://github.com/wger-project/react/pull/1105
-Related Issue: #1103
-Problem: When users first use the application, the empty routine page doesn't clearly guide users on how to start adding content.Actual development process: Created an arrow in OverviewEmpty component pointing to the add button via fabRef. Created fabRef to pass it to OverviewEmpty and AddRoutineFab in RoutineOverview. Added animated responsive arrow pointing from text to add button. Tested across different screen sizes to ensure the arrow remains properly positioned.Maintainer interaction: Maintainer @rolandgeider commented 2 weeks ago: "Hi! Thanks for the PR. I've reworked a bit the way the templates are handled in #1113, there are now in all template overviews action buttons that pre-fill the template and public flags as well as allowing to edit existing user templates, so I'm closing this here. The action button might be a bit 'lost' on the very edge, but I think the solution is to perhaps align it to the main content."Outcome: Closed unmerged - maintainer implemented alternative solution (#1113) to address the same UX issue.PR #1117 - Save Button Visual Feedback
+Personal fork test: https://github.com/vilanell000/react/pull/1
 
-Repository: https://github.com/vilanell000/react
+Problem: When users first enter the empty routine overview page, it's unclear how to start creating their first routine. The page has an add button (FAB), but new users might miss it (related issue #1103).
+Actual development process:
+Phase 1: Personal fork experiment
+Conducted initial development and testing in personal fork, creating complete implementation of animated responsive arrow. This version contained all functional features as proof of concept.
+Phase 2: Formal submission (PR #1105)
+
+Created an animated arrow pointing to the add button in OverviewEmpty component
+Created fabRef reference and passed it to OverviewEmpty and AddRoutineFab in RoutineOverview
+Implemented responsive animated arrow from prompt text to add button
+Modified fabRef type to HTMLElement for type safety
+Added animation effects to make arrow more prominent, improving user discovery rate
+
+Maintainer interaction: Maintainer @rolandgeider commented thanking for the PR, but explained he adopted a different solution in PR #1113—adding action buttons in all template overviews that can prefill templates and public flags, and allow editing existing user templates. He felt although action buttons might be somewhat "lost" at the edge position, the solution might be aligning them with main content.
+Outcome: Closed unmerged - maintainer adopted alternative solution (PR #1113).
+Issue #1117 - Exercise Search Save Button Visual Feedback [Bai Lu]
+
 Pull Request: https://github.com/wger-project/react/pull/1117
-Related Issue: #1114
-Problem: The save button in routine form lacks visual feedback, users don't know if save succeeded.Actual development process: Created new SaveButton component to replace standard button in routine form. Initial design showed red "save ❌" on failure and "save ✅" on success. After maintainer feedback, modified implementation: color no longer changes, button disabled during mutation, stays disabled for 1.5s after click (cooldown), shows "Saving…" then "Saved ✅" briefly, then resets. Kept ❌ to correspond with ✅ for consistency.Maintainer interaction: Maintainer @rolandgeider commented 5 days ago: "hey! Adding some feedback is definitely a good idea. My first impression is that making the button red is a bit 'too much'. How about we simply disable the button while the query is running, show the ✅ afterwards and then remove that after a timeout. If there are any errors we can use the FormQueryErrors component that shows them and the user can try again after changing the input." Adjusted implementation based on this feedback.Outcome: Awaiting review - PR has merge conflicts to resolve, CI build failing.Issue #1108 - Nutrition Table Precision Issue [Simin Cheng]
+
+Problem: Users have no visual feedback when saving search queries, unsure if operation succeeded.
+Root cause analysis:
+
+Save button has no visual feedback after click, users unsure if operation is processing
+Success or failure status has no clear indication
+Users might click repeatedly during network delays, causing multiple submissions
+
+Actual development process:
+Initial design attempted to make save button flash red after click, using CSS animation for pulse effect, but testing found effect too strong.
+Iterative improvements based on maintainer feedback:
+
+First revision: Removed red flashing, changed to disable button
+Second revision: Added gentler visual cues
+
+Disable button during query execution
+Show green checkmark (✅) on success
+Use project's existing FormQueryErrors component for errors
+
+
+Third revision: Refined interaction details
+
+Added debounce mechanism to avoid frequent requests
+Success prompt displays for 2 seconds then auto-disappears
+Ensure error messages are clear and understandable
+
+
+
+Maintainer interaction: Maintainer @rolandgeider commented: "Adding some feedback is definitely a good idea, the feature itself would need to be added to ExerciseSearchForm" but noted red flashing effect was "too much". Adjusted UI implementation three times according to project specifications.
+Outcome: Awaiting review - visual feedback enhancement complete but awaiting final approval.
+Issue #1108 - Nutrition Table Calculation Inaccuracy Due to Rounding [Simin Cheng]
 
 Repository: https://github.com/simin-ch/react/tree/nutrition-precision-feature
 Pull Request: In preparation
-Problem: Nutritional totals rounded prematurely, causing visible discrepancies between expected and displayed values.Actual development process: User reported nutrition sums wrong: individual protein, fat, and fiber values didn't add up to the displayed totals. After debugging, found src/utils/numbers.ts numberUnitLocale function set maximumFractionDigits: 0, each value rounded to integer before adding. First reaction was directly change to show decimals, but this would show decimals everywhere, making interface messy. Thought users should choose—enable when precision needed, keep integers otherwise. Implementation divided into six steps: first modified numberGramLocale function to accept precision parameter; added toggle buttons to each table (using useState); discovered each component state independent, not synced; switched to React Context for global state; added localStorage persistence; extracted reusable PrecisionToggleButton component. Process repeated many times, especially after discovering issue in step 3, almost rewrote all related components.Maintainer interaction: Detailed rounding-induced calculation inaccuracy in issue #1108, awaiting maintainer feedback.Outcome: In development - awaiting documentation polish before submission.Issue #1115 - Meal Form Timepicker Fix [Simin Cheng]
+
+Problem: Nutrition tables display inaccurate totals due to premature rounding. Root cause is numberUnitLocale function in src/utils/numbers.ts has maximumFractionDigits: 0, forcing all nutritional values to be rounded to integers before calculation.
+Root cause analysis:
+
+numberGramLocale function calls numberUnitLocale with hardcoded maximumFractionDigits: 0. This configuration forces all nutritional values to display as integers (rounded to whole numbers), while actual calculations are performed using precise stored values.
+Nutritional data is actually stored with 3 decimal places precision in the database.
+
+Actual development process:
+
+Phase 1: Fix number display function - Modified numberGramLocale function in src/utils/numbers.ts to accept precision setting, removed hardcoded maximumFractionDigits: 0, created new numberConfigurable function to display decimals when needed.
+Phase 2: Add toggle to tables - Added precision toggle buttons to nutrition tables, used React's useState to control integer or decimal display, added simple toggle buttons with icons and help text.
+Phase 3: Create global settings - Built global system using React Context to save precision settings across the app, added localStorage to remember user choices between browser sessions.
+Phase 4: Connect all components - Updated all nutrition tables to use global precision settings instead of their own local settings, used useNutritionPrecision hook to share same precision choice everywhere.
+Phase 5: Add controls to main pages - Wrapped React app with precision provider, added toggle buttons to main nutrition pages, ensured all nutrition displays use same precision setting.
+Phase 6: Create reusable button - Made standard PrecisionToggleButton component that looks and works the same everywhere, added precision control to more places like ingredient details, and improved help text.
+
+Maintainer interaction: Detailed the calculation inaccuracy caused by rounding in issue #1108, awaiting maintainer feedback.
+Outcome: In development - awaiting documentation polish before submission.
+Issue #1115 - Meal Form Time Field Not Editable [Simin Cheng]
 
 Repository: https://github.com/simin-ch/react/tree/fix-timepicker-bug
 Pull Request: https://github.com/wger-project/react/pull/1116
-Problem: "Add Meal" form couldn't properly edit meal time due to incompatible DateTime objects.Actual development process: When adding meal, time picker clicked but no response. Compared the implementation with other TimePicker usage patterns in the codebase and examined the author's comments in MealForm.tsx, found TimePicker component returns Luxon DateTime object, but Formik expects JavaScript Date object. Type mismatch caused Formik to ignore update. Fix was simple—convert the Luxon DateTime to JS Date in onChange: newValue.toJSDate(). When submitting PR, maintainer happened to be online, merged in 5 minutes.Maintainer interaction: When submitting PR #1116, explained root cause: Formik expects JS Date but received Luxon DateTime. Maintainer @rolandgeider responded quickly: "I had barely seen your original issue and you directly open this PR 😄" and merged the fix 5 days ago.Outcome: Merged - deployed to production.Issue #2040 - Language Switcher Dropdown Scrollability Fix [Ziqi Lin]
+
+Problem: In the "Add Meal" form, the time field cannot be properly edited or selected. Users cannot modify time when adding or editing meals, severely impacting meal logging functionality.
+Root cause: TimePicker component in MealForm.tsx receives Luxon DateTime object, but onChange handler directly passes Luxon DateTime object to Formik, which expects JavaScript Date object. This type mismatch prevents proper form state updates.
+Actual development process: Solution was to convert returned Luxon DateTime back to JS Date before saving to Formik. Added conversion in onChange handler: formik.setFieldValue('time', value.toJSDate()). Although fix was simple, finding this cause took two hours of debugging.
+Maintainer interaction: When submitting PR #1116, explained root cause: Formik expects JS Date but received Luxon DateTime. Maintainer @rolandgeider responded quickly: "I had barely seen your original issue and you directly open this PR 😄" and merged the fix 5 days ago.
+Outcome: Merged - deployed to production.
+Issue #2040 - Language Dropdown Overflow on Small Screens [Ziqi Lin]
 
 Repository: https://github.com/Carner-Lin/wger/tree/language-dropdown
 Pull Request: https://github.com/wger-project/wger/pull/2042
-Problem: On small screens, the footer's language dropdown extended beyond the viewport. The top entries became unreachable and the user couldn't scroll inside the menu.Actual development process: Reproduced the issue by resizing the window and inspecting the menu's computed styles. Confirmed the list had no height constraint and inherited positioning that didn't keep it within the viewport. Implemented a scoped CSS class on the dropdown <ul> with max-height: 60vh, overflow-y: auto, and overscroll-behavior: contain; also constrained width to avoid horizontal overflow. Verified that all languages remain accessible via internal scrolling on narrow windows.Maintainer interaction: Submitted PR with before/after screenshots and a CSS diff. Maintainer acknowledged the UI regression and approved after confirming no regressions on desktop breakpoints.Outcome: Merged - deployed to production.Height Spinner Allowed Negative Values [Ziqi Lin]
+
+Problem: Footer language dropdown extends beyond viewport on small windows, making top entries inaccessible. Users cannot scroll inside dropdown to access hidden languages.
+Root cause:
+
+Dropdown has no max height or scrolling behavior; its height grows with content.
+Menu relies on default Bootstrap styles; on small screens, absolute/fixed positioning doesn't constrain panel within viewport.
+
+Actual development process: Added specific CSS class to dropdown <ul> in template and introduced lightweight stylesheet, limiting menu height to viewport-relative value (max-height: 60vh) and enabling vertical scrolling (overflow-y: auto). Also limited width to avoid horizontal overflow and applied overscroll-behavior: contain so scroll gestures are captured by menu instead of leaking to page behind. Through these adjustments, menu now always remains fully usable on small screens: all languages accessible by scrolling inside dropdown.
+Maintainer interaction: PR received maintainer approval and was merged after submission.
+Outcome: Merged - deployed to production.
+Issue #2030 - Prevent Negative Height Values in Preferences [Ziqi Lin]
 
 Repository: https://github.com/Carner-Lin/wger/tree/Height-limit
 Pull Request: https://github.com/wger-project/wger/pull/2030
-Problem: In user preferences, the numeric spinner allowed values below 0, enabling invalid negative heights.Actual development process: Audited the form and model. Found missing HTML constraints and no server-side guard for negatives. Implemented form-level fixes: set type="number", step="1", and min="0" so the spinner stops at zero and browsers show a native "must be ≥ 0" prompt for invalid input. Manually tested keyboard entry and spinner interactions.Maintainer interaction: Provided a concise rationale in the PR explaining why client-side constraints improve UX even when model validation exists. Maintainer verified behavior locally and approved.Outcome: Merged - deployed to production.Issue #1120 - Routine List Thumbnail Overlapping Text on Narrow Screens [Ziqi Lin]
+
+Problem: The "Height (cm)" input allowed negative values via spinner in user preferences.
+Root cause:
+
+1. Model lacked a server-side validator to forbid negatives.
+2. Form widget missed HTML constraints (min="0"), so the browser spinner could go below 0.
+
+Actual development process: At the form layer, I set type="number", step="1", and min="0", which makes the spinner stop at zero and prompts a native “must be ≥ 0” message when the user types a negative number.
+Negative numbers are now prohibited for "height" in personal profile.
+Maintainer interaction: PR accepted and merged by maintainer after submission.
+Outcome: Merged - deployed to production.
+
+Issue #1120 - Layout Misalignment Causes Thumbnails to Obscure Text [Ziqi Lin]
 
 Repository: https://github.com/Carner-Lin/react/tree/routine-layout-fixes
 Pull Request: https://github.com/wger-project/react/pull/1121
-Problem: On the routine page, as the viewport narrows the exercise thumbnail drifted and visually obscured the text.Actual development process: Identified that the left "thumbnail column" was allowed to shrink/reflow under flex wrapping, while the right "text column" resisted shrinking due to min-content behavior. Updated the row to a non-wrapping layout so image and text stay aligned; fixed a non-shrinking width for the thumbnail column; allowed the text column to wrap within its own area; and stacked multiple thumbnails vertically with a small, consistent gap. Validated across common breakpoints and on mobile to ensure no overlap and stable rhythm.Maintainer interaction: Submitted targeted layout changes with screenshot; Author did a quick review.Outcome: Merged - pending next production deploy (not live yet).3. Lessons LearnedSubmit changes to the right repository - The workout ordering fix was initially applied to the compiled JavaScript bundle. Maintainers rightly rejected it and clarified that all React changes must be proposed in the wger-react repository. This experience highlighted the importance of understanding build pipelines before submitting patches.Design communication matters - For the calorie automation feature, presenting a bilingual, structured plan made it easier for maintainers to give feedback. Even though the feature is still under development, aligning ideas early prevented significant rework.Incremental wins build trust - Bai Lu's UI improvements show that even when initial attempts are not merged (PR #1105), the effort demonstrates competence and helps maintainers understand the contributor's intentions for subsequent PRs.Testing and reproducibility go hand-in-hand - For front-end layout fixes (language dropdown, routine thumbnails), attaching screenshots and responsive design notes reduced ambiguity and built reviewer confidence without requiring them to reproduce the environment manually.
+
+Problem: On routine page, as window width gradually decreases, distance between exercise thumbnail and text also decreases, causing it to obscure text.
+Root cause:
+
+Left "thumbnail column" isn't fixed; under flex wrapping it shrinks or reflows, allowing image to drift.
+Right "text column" maintains its minimum content width, so it doesn't shrink, effectively pushing the image.
+
+Actual development process: Made row a non-wrapping flex/grid container so image and text stay on same line, gave left column fixed, non-shrinking width. Also allowed right column to actually shrink and wrap by explicitly permitting width compression, so long titles wrap within their own column instead of displacing image. Then kept multiple thumbnails vertically stacked with small, consistent gap for visual rhythm. After changes, thumbnail column remains fixed at left across breakpoints, text wraps naturally within its area, and overlap/covering issue no longer occurs on phones or when desktop window is resized.
+Maintainer interaction: PR reviewed and merged by maintainer after submission.
+Outcome: Merged - deployed to production.
+3. Lessons Learned
+Submit changes to the right repository - Workout ordering fix was initially applied to compiled JavaScript bundle. Maintainers rightly rejected it and clarified all React changes must be proposed in wger-react repository. This experience highlighted importance of understanding build pipelines before submitting patches.
+Design communication matters - For calorie automation feature, presenting bilingual, structured plan made it easier for maintainers to give feedback. Even though feature is still under development, aligning ideas early prevented significant rework.
+Incremental wins build trust - Although Bai Lu's guide arrow feature (PR #1105) wasn't merged, it demonstrated thinking about user experience. Maintainer adopted different solution but acknowledged problem existence and need for improvement.
+Testing and reproducibility go hand-in-hand - For frontend layout fixes (language dropdown, routine thumbnails), attaching screenshots and responsive design notes reduced ambiguity and built reviewer confidence without requiring them to manually reproduce environment. Ziqi Lin's three merged PRs prove effectiveness of this approach.
+Understand project alternatives - Bai Lu's guide arrow being replaced by alternative solution shows importance of discussing design approaches with maintainers before implementation to avoid duplicate work.
