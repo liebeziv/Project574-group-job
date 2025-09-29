@@ -8,8 +8,8 @@ Name: Zhengrong Chen, Student ID: 1660321, Email: zc199@students.waikato.ac.nz
 1. Project Review
 1.1 Systematic Issues Identified
 Issue 1 - Naive Timestamps Break Timezone Support
-Location: Across workout logging(wger/manager/models/log.py), measurement tracking(wger/measurements/models/measurement.py), gallery uploads(wger/gallery/models/image.py), session scheduling(wger/manager/models/session.py), nutrition planning (wger/nutrition/models/plan.py).
-Risk: These components default to datetime.datetime.now() or datetime.date.today() which produce naive timestamps. With USE_TZ=True, records are persisted in server time, so users in other time zones see disordered or “future” entries. This undermines the reliability and any analytical dashboards.
+Location: Across workout logging(wger/manager/models/log.py), measurement tracking(wger/measurements/models/measurement.py), gallery uploads(wger/gallery/models/image.py), session scheduling(wger/manager/models/session.py), nutrition planning (wger/nutrition/models/plan.py) and related maintenance scripts (wger/tasks.py).
+Risk: These components default to datetime.datetime.now() or datetime.date.today(), which produce naive timestamps. With USE_TZ=True, records are persisted in server time, so users in other time zones see disordered or “future” entries across workout logs, measurement charts, nutrition diaries, reminders, and any downstream analytics. That undermines the consistency of day-to-day usage and the accuracy of reporting dashboards.
 Recommended fix: Create a TimezoneAwareModel / custom AwareDateTimeField and AwareDateField that inject timezone.now() / timezone.localdate() so every model inherits the rule. Also audit helper scripts such as wger/tasks.py to ensure no other naive datetime remain. Configure AppConfig checks to detect legacy fields during startup, and document the standard in the contributor guide.
 Expected impact: All timestamps obey one policy by default, eliminating recurring timezone defects and protecting workout histories, measurements, nutrition logs, and dashboards as the system scales.
 Issue 2 - WorkoutLog.str Always Displays "kg"
