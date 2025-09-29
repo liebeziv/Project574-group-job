@@ -7,11 +7,11 @@ Name: Zhengrong Chen, Student ID: 1660321, Email: zc199@students.waikato.ac.nz
 
 1. Project Review
 1.1 Systematic Issues Identified
-Issue 1 - WorkoutLog Uses Naive Timestamp
-Location: wger/manager/models/log.py:53
-Risk: default=datetime.datetime.now returns a naive datetime. With USE_TZ=True in the default configuration, all log entries are stored in server time, causing users in other time zones to see disordered or "future" timestamps, undermining the reliability of training history and analytical dashboards.
-Recommended fix: Import timezone from Django and change to default=timezone.now. Also audit utility scripts (e.g., wger/tasks.py) for any remaining naive datetimes.
-Expected impact: Ensures training logs accurately reflect chronological order across all regions, which is critical for international users and downstream analytics such as weekly reports and reminders.
+Issue 1 - Naive Timestamps Break Timezone Support
+Location: Across workout logging(wger/manager/models/log.py), measurement tracking(wger/measurements/models/measurement.py), gallery uploads(wger/gallery/models/image.py), session scheduling(wger/manager/models/session.py), nutrition planning (wger/nutrition/models/plan.py) and related maintenance scripts (wger/tasks.py).
+Risk: These components default to datetime.datetime.now() or datetime.date.today() which produce naive timestamps. With USE_TZ=True, records are persisted in server time, so users in other time zones see disordered or “future” entries. This undermines the reliability and any analytical dashboards.Recommended
+Recommended fix: Import django.utils.timezone and replace naive defaults with timezone.now() (or timezone.localdate() for dates). Also audit helper scripts such as wger/tasks.py to ensure no other naive datetime remain.
+Expected impact: Workout histories, measurements, nutrition logs, galleries, and analytics remain chronologically correct for every region, eliminating recurring timezone-related defects.
 Issue 2 - WorkoutLog.str Always Displays "kg"
 Location: wger/manager/models/log.py:226
 Risk: String representation always concatenates "kg" regardless of actual unit. Administrators viewing logs in Django admin or exporting CSVs will be misled, potentially making incorrect coaching decisions.
