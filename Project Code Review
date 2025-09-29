@@ -135,6 +135,20 @@ Root cause: TimePicker component in MealForm.tsx receives Luxon DateTime object,
 Actual development process: Solution was to convert returned Luxon DateTime back to JS Date before saving to Formik. Added conversion in onChange handler: formik.setFieldValue('time', value.toJSDate()). Although fix was simple, finding this cause took two hours of debugging.
 Maintainer interaction: When submitting PR #1116, explained root cause: Formik expects JS Date but received Luxon DateTime. Maintainer @rolandgeider responded quickly: "I had barely seen your original issue and you directly open this PR 😄" and merged the fix 5 days ago.
 Outcome: Merged - deployed to production.
+
+Issue #1122
+Repository: https://github.com/simin-ch/react/tree/feature/fab-alignment
+Pull Request: https://github.com/wger-project/react/pull/1125
+Problem: The floating action button (FAB) currently snaps to the right edge of the viewport. On wider displays this leaves it visually detached from the central layout, making it harder for users to notice and reach.
+Root cause: Every FAB uses position: fixed with right: theme.spacing(2) (16px). The main layout is wrapped in <Container maxWidth="lg"> (1200px), so once the viewport is wider than 1200px, the content stays centered but the FAB remains fixed to the screen edge, breaking alignment.
+Actual development process:
+1) Inspected the shared FAB components and confirmed they were position: fixed with right: theme.spacing(2) pinned to the viewport edge.
+2)Reviewed the layout: content sits inside a centered <Container maxWidth="lg">, so wide viewports leave the FAB detached.
+3)Calculated how far the container is from the screen edge and proposed an updated sx.right using max(${theme.spacing(2)}, calc((100vw - ${theme.breakpoints.values.lg}px) / 2 + ${theme.spacing(2)})).
+4)Applied that change across all FAB components, then manually tested at narrow and wide widths to ensure the FAB hugs the content on large screens while still keeping a 16px margin on small ones.
+Maintainer interaction: PR received maintainer approval and was merged after submission.
+Outcome: Merged - deployed to production.
+
 Issue #2040 - Language Dropdown Overflow on Small Screens [Ziqi Lin]
 
 Repository: https://github.com/Carner-Lin/wger/tree/language-dropdown
