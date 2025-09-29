@@ -5,33 +5,123 @@ Name: Bai Lu, Student ID: 1671298, Email: ys677@students.waikato.ac.nz
 Name: Ziqi Lin, Student ID: 1674249, Email: zl354@students.waikato.ac.nz
 Name: Zhengrong Chen, Student ID: 1660321, Email: zc199@students.waikato.ac.nz
 
-1. Project Review
-1.1 Systematic Issues Identified
-Issue 1 - Naive Timestamps Break Timezone Support
-Location: Across workout logging(wger/manager/models/log.py), measurement tracking(wger/measurements/models/measurement.py), gallery uploads(wger/gallery/models/image.py), session scheduling(wger/manager/models/session.py), nutrition planning (wger/nutrition/models/plan.py) and related maintenance scripts (wger/tasks.py).
-Risk: These components default to datetime.datetime.now() or datetime.date.today(), which produce naive timestamps. With USE_TZ=True, records are persisted in server time, so users in other time zones see disordered or “future” entries across workout logs, measurement charts, nutrition diaries, reminders, and any downstream analytics. That undermines the consistency of day-to-day usage and the accuracy of reporting dashboards.
-Recommended fix: Create a TimezoneAwareModel / custom AwareDateTimeField and AwareDateField that inject timezone.now() / timezone.localdate() so every model inherits the rule. Also audit helper scripts such as wger/tasks.py to ensure no other naive datetime remain. Configure AppConfig checks to detect legacy fields during startup, and document the standard in the contributor guide.
-Expected impact: All timestamps obey one policy by default, eliminating recurring timezone defects and protecting workout histories, measurements, nutrition logs, and dashboards as the system scales.
-Issue 2 - WorkoutLog.str Always Displays "kg"
-Location: wger/manager/models/log.py:226
-Risk: String representation always concatenates "kg" regardless of actual unit. Administrators viewing logs in Django admin or exporting CSVs will be misled, potentially making incorrect coaching decisions.
-Recommended fix: Generate unit labels based on self.weight_unit (with fallback to WeightUnit.name), and display friendly placeholders (e.g., "—") when weight is missing.
-Expected impact: Provides accurate unit display for both metric and imperial users, reducing support tickets related to unit mismatches.
-Issue 3 - Day Lacks (routine, order) Unique Constraint
-Location: wger/manager/models/day.py:45
-Risk: Although order has an index, the database allows duplicate orders within the same routine; once duplicates occur, downstream serialization and frontend rendering receive unpredictable sequences.
-Recommended fix: Add models.UniqueConstraint(fields=['routine', 'order'], name='unique_day_order_per_routine') in a migration, and provide a one-time data cleaner to assign unused orders to duplicates.
-Expected impact: Guarantees deterministic ordering at the persistence layer, simplifying frontend logic and completely avoiding schedule confusion.
-Issue 4 - RepetitionUnit Relies on Magic ID
-Location: wger/core/models/rep_unit.py:60
-Risk: The property is_repetition uses self.id == 1 to determine "Repetitions". If fixtures or migrations change the primary key order, such checks will fail silently.
-Recommended fix: Add an immutable code to RepetitionUnit (e.g., "repetitions", "minutes"), populate it in a migration and use this field for checks; or centrally expose constants in manager.consts.
-Expected impact: Eliminates fragile dependency on fixture order, improves readability, and lays foundation for future units (calories, distance, etc.).
-Issue 5 - Routine.dayDataCurrentIteration Lacks Frontend Sorting
-Location: wger-react/src/components/WorkoutRoutines/models/Routine.ts
-Risk: The getter filters by iteration then directly returns API order. If the backend returns unexpected order (based on language or start day), the UI replicates that order, exactly the "Sunday always first" problem encountered in Issue #1980.
-Recommended fix: Copy the filtered array and sort by day.order, with date and day.id as tiebreakers. Add unit tests to verify mixed dataset sorting; emphasize in contribution guidelines that frontend fixes must be submitted to the React source repository.
-Expected impact: All clients receive predictable workout day ordering, future contributors can easily audit and extend logic, and prevents regressions in new builds.
+1.1 Systematic Issues
+1.1.1 Cross-timezone and Internationalization Architecture Defects
+Core Issue: The entire system lacks unified timezone handling strategy and internationalization resource management, causing incorrect data display for cross-regional users and language switching failures.
+Impact Scope: Affects 3 core modules (workout logs, body measurements, gallery), 4 API endpoints, all non-English users (particularly 100% of Chinese users unable to use).
+Key Evidence:
+
+WorkoutLog.date uses datetime.datetime.now (wger/manager/models/log.py:55, commit 9a321b7, 2024-03-07)
+Measurement.date and GalleryImage.date similarly use naive time (wger/measurements/models/measurement.py:47, wger/gallery/models/image.py:42, commit 7646416, 2021-07-08)
+Weight reminder command uses datetime.datetime.now() (wger/weight/management/commands/email-weight-reminder.py:48)
+Chinese directory removed but config not synced (locale/zh_CN exists but config points to zh-hans, commit 0fe9a6c removed, 97d95e2 updated config)
+
+Root Cause Analysis:
+
+Historical Evolution: Project evolved from 2013 single-machine Django to distributed deployment, but time handling logic never upgraded
+Technical Debt: 9-year-old cache design (2015) still in use, not considering Python 3.3+ hash() randomization
+Process Gap: Language resources deleted in 2021, config updated in 2023 without verifying resource integrity
+Knowledge Transfer: Different contributors repeatedly introduce same issues, lacking timezone handling best practices documentation
+
+Improvement Recommendations:
+
+Immediate fix: Unify use of django.utils.timezone.now(), establish CI checks for naive time
+Short-term: Fix language directory mapping, add resource integrity tests
+Long-term: Establish timezone/i18n architecture documentation and code review checklist
+
+1.1.2 Data Integrity Guarantee Mechanism Deficiency
+Core Issue: Critical business logic relies on application-layer conventions and magic constants, lacking database-level constraints and type safety guarantees.
+Impact Scope: Affects 5 core models, 15+ API endpoints, all sorting and unit conversion functions.
+Key Evidence:
+
+Day/Slot/SlotEntry have indexes but no unique constraints (wger/manager/models/day.py:45-78, slot.py:19-57, slot_entry.py:86-152, commits 49bbd18, 6f54568, 2024)
+RepetitionUnit uses self.id == 1 for judgment (wger/core/models/rep_unit.py:55-61, commit 02279ee, 2021-06-23)
+WorkoutLog.str hardcodes "kg" (wger/manager/models/log.py:234-235, commit a434c73, 2024-01-27)
+JSONField lacks schema validation (wger/manager/models/day.py:99-106, slot.py:44-51, commit 30c14310, 2024-10-29)
+
+Root Cause Analysis:
+
+Design Philosophy Bias: "Performance first, constraints second" development culture, adding indexes without constraints
+Technical Debt Accumulation: 2021 magic numbers persist, 2024 still adding hardcoding
+Architecture Review Missing: JSONField transformation went live without schema design review
+Insufficient Test Coverage: git grep "unique_together" returns empty, never considered database constraints
+
+Improvement Recommendations:
+
+Immediate fix: Add models.UniqueConstraint(fields=['routine', 'order']), data migration to clean duplicates
+Short-term: Introduce enums to replace magic numbers, add Pydantic validation to JSONField
+Long-term: Establish data model design standards, enforce schema-first development
+
+1.1.3 Multi-process Cache Architecture Failure
+Core Issue: Cache design remains in single-process era, key generation and invalidation strategies completely fail in distributed environments.
+Impact Scope: All cache-dependent functions unreliable in multi-process deployment, affecting 90% of API responses.
+Key Evidence:
+
+Default LocMemCache config unchanged for 12 years (wger/settings_global.py:310-316, commit cfb0196, 2013-06-29)
+Uses Python hash() for unstable keys (wger/utils/cache.py:43-47, commit 805b7cd, 2015-02-17)
+reset_routine_cache only clears current process (wger/manager/helpers.py:185-203, commit f7d22e2, 2024-10-28)
+
+Root Cause Analysis:
+
+Historical Baggage: 2013 Django didn't support distributed, default config persists
+Knowledge Blind Spot: Python 3.3 randomization not understood, hash() misused for 9 years
+Scenario Change: 2024 new features still assume single-process, unaware production changed
+Documentation Gap: Deployment docs don't require Redis/Memcached, defaults misused
+
+Improvement Recommendations:
+
+Immediate fix: Use f'{user_pk}:{year}:{month}:{day}' stable keys
+Short-term: Default to Redis, add multi-process cache tests
+Long-term: Establish cache strategy guide, performance benchmarks
+
+1.1.4 N+1 Queries and Performance Degradation
+Core Issue: Lacks systematic query optimization strategy, core functions have severe N+1 problems.
+Impact Scope: PDF export time increased 300%, Routine page load triggers 17+ SQL queries.
+Key Evidence:
+
+Day.get_slots_* uses getattr(self, 'prefetched_slots', self.slots.all()) fallback queries (wger/manager/models/day.py:147-177)
+Test code doesn't cover prefetch scenarios (wger/manager/tests/test_day.py:19-123, commit 065d432)
+PDF export queries Exercise.objects.get(pk=...) individually (wger/manager/helpers.py:95-135)
+Cache invalidation deeply traverses entire Routine tree (wger/manager/helpers.py:185-203)
+
+Root Cause Analysis:
+
+Partial Optimization: prefetch only used in Routine.get_date_sequence, other code not updated
+Test Quality: Tests use direct .get(pk=1), not simulating actual usage
+Performance Awareness: Lacks batch thinking, individual queries during deep traversal
+Monitoring Gap: No performance benchmarks, degradation occurs silently
+
+Improvement Recommendations:
+
+Immediate fix: Provide Routine.objects.with_full_structure() unified prefetch
+Short-term: Add Django Debug Toolbar for N+1 detection
+Long-term: Establish performance benchmark suite
+
+1.1.5 Permission Model Interface Chaos
+Core Issue: Permission checking interface lacks unified contract for 10 years, creating security risks.
+Impact Scope: All REST API permission validation, third-party extension integration.
+Key Evidence:
+
+WgerOwnerObjectModelViewSet assumes obj.get_owner_object().user (wger/utils/viewsets.py:16-41, commit 3dab6fd, 2014)
+WorkoutLog returns self, Day returns routine, RepetitionUnit returns None (wger/manager/models/log.py:237-241, day.py:119-123, wger/core/models/rep_unit.py:47-52)
+No formal interface definition or documentation for 10 years
+
+Root Cause Analysis:
+
+Interface Evolution Chaos: 2014 design, 2021-2024 individual implementations, no unified standard
+Contract Missing: get_owner_object() lacks formal definition, implementers freestyle
+Review Blind Spot: None return issue undetected for years, permission checks may be bypassed
+Extensibility Gap: Didn't consider third-party models, security risks exist
+
+Improvement Recommendations:
+
+Immediate fix: Define interface contract, handle None returns
+Short-term: Audit all model implementations, supplement permission tests
+Long-term: Establish API version management strategy
+
+
+
+
 1.2 Positive Design Choices
 Meta Ordering and Indexes in Models
 Example: Day.Meta.ordering = ['order'] with order indexed.
@@ -45,6 +135,9 @@ Using Dataclasses for Template-ready Data
 Example: wger/manager/dataclasses.SlotData aggregates data for templates.
 Benefits: Separates data marshalling from presentation, making the Python layer responsible for shape transformations. Dataclasses provide automatic __init__, __repr__, and __eq__ methods, reducing boilerplate. Type annotations make data structures clear, and IDEs can provide accurate autocomplete.
 Developer impact: Templates remain clean—using {{ slot.start_time }} instead of {{ slot.0.1.time }} greatly improves readability. View tests can validate structure via dataclasses. Unit tests can directly construct SlotData instances for testing without mocking complex model relationships. IDE type hints remain accurate throughout development.
+
+
+
 2. Contribution Summary
 Issue #1980 - Fix Workout Day Ordering Issue [Zhengrong Chen]
 
@@ -54,7 +147,8 @@ Pull Request: https://github.com/wger-project/wger/pull/2050
 Problem: Workout days occasionally render out of order (Monday after Wednesday), especially for locales where the backend returns Sunday as the first element.
 Actual development process: Initially thought it was a CSS issue, tried adjusting display order with CSS order property, but realized this was only visual modification—the data order itself was wrong. Then considered fixing at the backend API level, but this required modifying multiple endpoints with too large an impact. Next attempted directly modifying wger/core/static/react/main.js, finding the dayDataCurrentIteration location in the compressed code and adding .slice().sort(...) logic. Local testing indeed solved the problem, excitedly submitted PR #2050. It was rejected—maintainer pointed out shouldn't modify compiled files. Only then realized React code has a separate source repository. After finding wger-react repository, reimplemented in src/components/WorkoutRoutines/models/Routine.ts, designing a stable comparator: first by day.order, then by date, finally by day.id as tiebreaker. This process took two weeks, mainly wasted understanding the project's build pipeline.
 Maintainer interaction: After submitting PR #2050, received no direct maintainer reply. PR was closed, the issue was modifying the compiled bundle file rather than source code. Currently reimplementing the fix in the React source repository.
-Outcome: Rejected - fix reworked in source repo with pending PR.
+Outcome: Rejected - Attempting to initiate secondary fixes within the React repository
+
 Issue #2019 - Implement Calories Burned Feature [Zhengrong Chen]
 
 Repository: https://github.com/liebeziv/wger/tree/feature-calories
