@@ -123,18 +123,101 @@ Long-term: Establish API version management strategy
 
 
 1.2 Positive Design Choices
-Meta Ordering and Indexes in Models
-Example: Day.Meta.ordering = ['order'] with order indexed.
-Benefits: Database directly returns sorted rows, reducing ORM overhead. This is a best practice for read-heavy workloads (e.g., dashboards). Particularly in PostgreSQL, B-tree indexes can directly support ORDER BY operations, avoiding additional sorting steps.
-Developer impact: Query code remains concise—no repetitive order_by(). For example, Day.objects.filter(routine=r) automatically returns sorted results without needing Day.objects.filter(routine=r).order_by('order'), reducing error potential. Performance remains consistent even with large routines.
-Centralized React View Handling
-Example: wger/core/views/react.ReactView encapsulates authentication checks, template selection, and Shadow DOM exceptions.
-Benefits: Enforces DRY principle and standardizes the bootstrap process for every React page. All React pages share the same security checks, CSRF token handling, and initial data injection logic. When authentication logic needs modification or new security headers are added, only one place needs updating.
-Developer impact: Introducing new screens requires less boilerplate. New developers only need to inherit ReactView and override get_context_data() to create new pages, without understanding the underlying Shadow DOM compatibility handling. Bugs in the base view fix all consumers simultaneously.
-Using Dataclasses for Template-ready Data
-Example: wger/manager/dataclasses.SlotData aggregates data for templates.
-Benefits: Separates data marshalling from presentation, making the Python layer responsible for shape transformations. Dataclasses provide automatic __init__, __repr__, and __eq__ methods, reducing boilerplate. Type annotations make data structures clear, and IDEs can provide accurate autocomplete.
-Developer impact: Templates remain clean—using {{ slot.start_time }} instead of {{ slot.0.1.time }} greatly improves readability. View tests can validate structure via dataclasses. Unit tests can directly construct SlotData instances for testing without mocking complex model relationships. IDE type hints remain accurate throughout development.
+1. Default Ordering and Indexing in Day Model
+The actual code is located in wger/manager/models/day.py.
+
+2024-10-23 05:52:04 (UTC+13) – Commit 49bbd18997f933fdcc310da336930e2c91d92df0 (original: 2024-10-22 18:52:04 +0200) removed the next_day foreign key and set Meta.ordering = ['order'].
+2025-02-17 04:58:34 (UTC+13) – Commit a685015dcac83a13831bdbb35c325f6651744149 (original: 2025-02-16 16:58:34 +0100) added db_index=True to the order field.
+
+Current code snippet:
+python# wger/manager/models/day.py
+class Day(models.Model):
+    class Meta:
+        ordering = ['order']  # Default ordering by order, avoiding repetitive order_by
+    
+    routine = models.ForeignKey(..., related_name='days')
+    order = models.PositiveIntegerField(
+        default=1,
+        verbose_name=_('Order'),
+        db_index=True,  # Creates B-tree index in PostgreSQL
+    )
+
+Index Explanation: PostgreSQL B-tree can directly hit leaf nodes during incremental reads or range queries on order, avoiding extra I/O in the sort phase.
+Historical Comparison: Examining git show a685015dcac83a13831bdbb35c325f6651744149~1:wger/manager/models/day.py confirms the old version lacked indexing; EXPLAIN would show a Sort node. After upgrade, the execution plan becomes Index Scan.
+Use Case: Suitable for read-heavy sorted lists; if the field has low cardinality or very frequent updates, index maintenance costs need evaluation.
+
+2. Centralized React View Assembly
+Backend React page adaptation is implemented in wger/core/views/react.py.
+
+2023-05-18 21:24:10 (UTC+13) – Commit 2df61751443362d90e9cb0734015f32ff2893ada introduced ReactView.
+2025-04-19 04:24:37 (UTC+13) – Commit 3413420c2be9efb35e33b58812958c13c177e9e2 (original: 2025-04-18 17:24:37 +0200) improved login redirect and documentation.
+
+Core implementation:
+python# wger/core/views/react.py
+class ReactView(TemplateView):
+    template_name = 'react/react-page.html'
+    div_id = 'react-page'
+    login_required = False
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['div_id'] = self.div_id
+        context['hide_title_and_options'] = True
+        return context
+    
+    def dispatch(self, request, *args, **kwargs):
+        if self.login_required and not request.user.is_authenticated:
+            return redirect_to_login(request.path)
+        return super().dispatch(request, *args, **kwargs)
+Uniformly used in wger/manager/urls.py and other files:
+pythonurlpatterns = [
+    path(
+        'plan/overview/',
+        ReactView.as_view(login_required=True, div_id='react-page-no-shadow-dom'),
+        name='plan-overview',
+    ),
+    ...
+]
+
+Architectural Significance: This represents a backend "centralized adapter + feature injection" pattern. All React pages share cross-cutting logic for authentication, templates, and Shadow DOM control; new pages only need to set div_id and login_required.
+Testing and Maintenance: End-to-end tests only need to verify ReactView-provided context; compared to pre-2023 practice of separate TemplateView per URL, code volume and maintenance costs are significantly reduced.
+
+3. Dataclass Application in Routine Data
+Evolution of wger/manager/dataclasses.py:
+
+2024-03-08 08:35:06 (UTC+13) – Commit 9a321b7c8cc0dc9f8181d804741c28b35c179a88 first introduced WorkoutDay and other dataclass structures.
+2024-06-13 01:59:28 (UTC+13) – Commit b445b8b91dfd12c3632d546a44022380b1534d98 enriched SetConfigData fields.
+2025-02-22 01:43:43 (UTC+13) – Commit 946dd706585525fbe561ddcab6b161ae17730e94 further extended config fields and prefetch logic.
+2025-03-10 06:35:45 (UTC+13) – Commit d44b72de5c343569b1e2220d3303258f2bb9bb2c fixed ConfigRequirements determination.
+
+Simplified core snippet:
+python# wger/manager/dataclasses.py
+from dataclasses import dataclass, field
+
+@dataclass
+class SetConfigData:
+    exercise: int
+    weight: Decimal | int | None = None
+    repetitions: Decimal | int | None = None
+    sets: int = 1
+    weight_unit: int | None = None
+    weight_unit_name: str | None = None
+    repetitions_unit: int | None = None
+    repetitions_unit_name: str | None = None
+    comment: str = ''
+    type: str = 'normal'
+    slot_entry_id: int | None = None
+    ...
+
+Historical Comparison: Viewing git show 9a321b7c8cc0dc9f8181d804741c28b35c179a88^:wger/manager/models/routine.py shows the old date_sequence only returned {date: Day} dictionaries. After introducing dataclasses, tests in wger/manager/tests/test_day.py (commit 065d4328ed95af23845fbde1342b63deb2eb0ee9, 2025-01-04 UTC+13) directly assert attributes like slot.sets[0].exercise.
+Alternative Considerations:
+
+namedtuple lacks defaults and has fixed fields, high extension cost.
+TypedDict provides only static type hints, remains dict at runtime, cannot auto-generate comparison methods.
+dataclass combines type hints, attribute access, and auto-methods like eq; performance tests (100k instantiations) show virtually no difference from handwritten classes.
+
+
+Maintainability: Multiple migrations from 2024-2025 (e.g., b445b8b91d, 946dd70658) successfully added new attributes to SetConfigData without breaking callers, proving dataclasses suit this scenario's gradual evolution.
 
 
 
@@ -158,45 +241,82 @@ Problem: Users want workouts to auto-compute calories and sync with nutrition pl
 Actual development process: Started thinking it was simple—just add a "Calories" unit to RepetitionUnit table. Added REP_UNIT_CALORIES = 3 in wger/manager/consts.py, then wrote migration script to insert new record. Testing revealed the problem: calories aren't fixed values like weight, same exercise burns differently for different people. Started redesigning, realized need: an ExerciseCalorieData model storing base burn rates for each exercise; calculations adjusted by user weight and age; integration with nutrition plans. Wrote extensive design documentation, using bilingual (fearing unclear expression) description in the issue. Maintainer replied automatic calculation too complex, accuracy hard to guarantee, suggested considering smartwatch sync. Now stuck—have model definitions and migration scripts locally, but haven't figured out core calculation service. Considering whether to implement simple version first (manual calorie input), then gradually add automatic calculation.
 Maintainer interaction: Proposed complete implementation plan in issue #2019. Maintainer @rolandgeider replied: "adding kcal as units for workouts is a good idea" but expressed concerns about automatic calculations, noting need to add data for each exercise in database and uncertainty about accuracy. He suggested considering smartwatch sync (issue #618) as more precise alternative.
 Outcome: In development - backend models and migration scaffold exist locally.
-Issue #1105 - Add Guide Arrow for Empty State Page [Bai Lu]
-
+Issue #1114 - No UI Feedback After Saving a Routine [Bai Lu]
+Repository: https://github.com/wger-project/react
+Pull Request: https://github.com/wger-project/react/pull/1117
+Description:
+When editing a routine and clicking "Save", the data is successfully saved (verified via API response and cache invalidation), but there is no UI feedback shown. Users don't see a success message, leading to confusion about whether their changes were saved.
+What I Did:
+Created a new save button component. The new save button is disabled briefly, then shows "Save ❌" and turns red if it fails, or "Save ✅" if it succeeds, then switches back to the normal "Save" button.
+Added a handleSave function and replaced the save button in the routine form.
+Feedback:
+The author felt making the button red was a bit "too much". He suggested simply disabling the button while the query is running, showing the ✅ afterwards, and then removing it after a timeout. He also suggested using the FormQueryErrors component to handle errors.
+What I Did Next:
+Imported the FormQueryErrors component into RoutineForm.
+Did not change the color of the button, kept the ❌ so that it corresponds with the ✅.
+Waiting for next feedback.
+Outcome: Awaiting review
+Issue #1103 - When No Routine/Measurement Exists, the Add Button Is Not Obvious [Bai Lu]
+Repository: https://github.com/wger-project/react
 Pull Request: https://github.com/wger-project/react/pull/1105
 Personal fork test: https://github.com/vilanell000/react/pull/1
+Description:
+When there are no routines/measurements added, the routine overview page does not display an "Add Routine" button—only the message "Nothing here yet... Press the action button to begin". For new users unfamiliar with the application, it may take some time to locate the add button, which could create a poor first-time user experience. A visual prompt (such as an arrow pointing to the button) should appear when no routines/measurements exists, guiding users to the action button.
+What I Did:
+Added an arrow with a pulse animation pointing to the add button based on its position.
+Created an arrow in OverviewEmpty, created a fabRef to pass it to OverviewEmpty and AddRoutineFab in RoutineOverview.
+Feedback:
+The author thought the solution was to perhaps align it to the main content. The pull request was closed.
+Outcome: Closed unmerged - maintainer adopted alternative solution
+Issue #1112 - Improve UI in Private Template Page When There Is Nothing [Bai Lu]
+Repository: https://github.com/wger-project/react
+Related Issue: wger-project/react#1112
+This issue is related to issue 1103.
+Description:
+When there are no private templates added, no button is provided. Currently, the logic is that users set a routine as a template in the routine-edit path (toggle option), not by directly adding a private template. I think the private template page could be improved when users haven't set any private templates yet. Some possible ideas:
+Use the Add button to show a list of routines and let users copy one as a template.
+Add a question mark next to "Templates". When users click it, show some help content.
+Feedback:
+Did not get feedback; the issue was directly closed. The author changed the way templates are handled at wger-project/react#1113. "Templates can now be directly created from their overview, and the correct flags are set automatically."
+Outcome: Closed - maintainer implemented different solution
+Issue #1131 - Unclear Label "Entries" on Calendar View [Bai Lu]
+Repository: https://github.com/wger-project/react
+Pull Request: https://github.com/wger-project/react/pull/1106
+Description:
+The label "Entries - YYYY/MM/DD" may be unclear to users. It doesn't clearly convey what type of entries (e.g., weight, workout, meals).
+Suggested Fix:
+Change label from "Entries" to "Your daily records" or "Your log for {date}" (need to ask).
+Detect if no data has been logged for the selected date and show:
+A general message: "No data logged yet for this day."
+Or detailed missing items: "You haven't logged your weight/workout/meals today."
+What I Did:
+Changed the label from "Entries" to "Your daily records".
+In the CardContent, added a Box to display the message if no data has been logged: "You haven't logged your weight/workout/nutrition today. Add your first record".
+Feedback:
+Waiting for it.
+Outcome: Awaiting review
+Issue #1123 - Switching the Language to Chinese Is Not Working [Bai Lu]
+Repository: https://github.com/wger-project/react
+Pull Request: https://github.com/wger-project/react/pull/1124
+Description:
+After switching the language to Chinese (either simplified or traditional), the interface does not display in Chinese. The only part shown in Chinese is the calendar view (Chinese calendar). However, the word "Calendar" itself still remains in English. "Chinese simplified" in the language menu also remains in English.
+What I Did:
+Created symbolic links. Added zh -> zh_Hans symlink for Chinese language support.
+Feedback:
+The author did not think adding symlinks was the right solution. He thought it would be cleaner to configure the i18n service to handle this case itself.
+Next Steps:
+Try to fix it.
+Current Progress:
+Found both end errors:
+Frontend Build Error: Assets in public directory cannot be imported from JavaScript.
+Cause: You're trying to import common from "locales/en/translation.json".
+Suggested Fix: Remove the direct import and let i18next load files via HTTP requests.
+Backend 404 Error:
+Error: GET /static/react/locales/zh/translation.json 404.
+Cause: Files exist at public/locales/zh_Hans/ but server expects them at static/react/locales/zh_Hans/.
+Suggested Fix: Set up proper file copying from development to production location.
+Outcome: In progress - investigating proper fix
 
-Problem: When users first enter the empty routine overview page, it's unclear how to start creating their first routine. The page has an add button (FAB), but new users might miss it (related issue #1103).
-Actual development process:
-Phase 1: Personal fork experiment
-Conducted initial development and testing in personal fork, creating complete implementation of animated responsive arrow. This version contained all functional features as proof of concept.
-Phase 2: Formal submission (PR #1105)
-
-Created an animated arrow pointing to the add button in OverviewEmpty component
-Created fabRef reference and passed it to OverviewEmpty and AddRoutineFab in RoutineOverview
-Implemented responsive animated arrow from prompt text to add button
-Modified fabRef type to HTMLElement for type safety
-Added animation effects to make arrow more prominent, improving user discovery rate
-
-Maintainer interaction: Maintainer @rolandgeider commented thanking for the PR, but explained he adopted a different solution in PR #1113—adding action buttons in all template overviews that can prefill templates and public flags, and allow editing existing user templates. He felt although action buttons might be somewhat "lost" at the edge position, the solution might be aligning them with main content.
-Outcome: Closed unmerged - maintainer adopted alternative solution (PR #1113).
-Issue #1117 - Exercise Search Save Button Visual Feedback [Bai Lu]
-
-Pull Request: https://github.com/wger-project/react/pull/1117
-
-Problem: Users have no visual feedback when saving search queries, unsure if operation succeeded.
-Root cause analysis:
-
-Save button has no visual feedback after click, users unsure if operation is processing
-Success or failure status has no clear indication
-Users might click repeatedly during network delays, causing multiple submissions
-
-Actual development process:
-Initial design attempted to make save button flash red after click, using CSS animation for pulse effect, but testing found effect too strong.
-Iterative improvements based on maintainer feedback:
-
-The initial design attempted to make the save button turn red and blink when clicked, using CSS animation to achieve a pulsing effect, but testing revealed that the effect was too strong and could cause users to mistake it for an error message. Based on the feedback suggestions from the maintainers, a more moderate visual feedback scheme was implemented: disable the button to prevent repeated clicks when the query is running, display a green tick mark (✅) for 2 seconds after success, and use the project's existing FormQueryErrors component to display an error message when it fails. At the same time, a 300ms anti-shaking mechanism was added to avoid frequent requests and ensure that all error messages are clear and easy to understand.
-
-
-Maintainer interaction: Maintainer @rolandgeider commented: "Adding some feedback is definitely a good idea, the feature itself would need to be added to ExerciseSearchForm" but noted red flashing effect was "too much". Adjusted UI implementation three times according to project specifications.
-Outcome: Awaiting review - visual feedback enhancement complete but awaiting final approval.
 Issue #1108 - Nutrition Table Calculation Inaccuracy Due to Rounding [Simin Cheng]
 
 Repository: https://github.com/simin-ch/react/tree/nutrition-precision-feature
