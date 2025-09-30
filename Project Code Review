@@ -5,8 +5,8 @@ Name: Bai Lu, Student ID: 1671298, Email: ys677@students.waikato.ac.nz
 Name: Ziqi Lin, Student ID: 1674249, Email: zl354@students.waikato.ac.nz
 Name: Zhengrong Chen, Student ID: 1660321, Email: zc199@students.waikato.ac.nz
 
-1.1 Systematic Issues
-1.1.1 Cross-timezone and Internationalization Architecture Defects
+1 Systematic Issues
+1.1 Cross-timezone and Internationalization Architecture Defects
 Core Issue: The entire system lacks unified timezone handling strategy and internationalization resource management, causing incorrect data display for cross-regional users and language switching failures.
 Impact Scope: Affects 3 core modules (workout logs, body measurements, gallery), 4 API endpoints, all non-English users (particularly 100% of Chinese users unable to use).
 Key Evidence:
@@ -29,7 +29,7 @@ Immediate fix: Unify use of django.utils.timezone.now(), establish CI checks for
 Short-term: Fix language directory mapping, add resource integrity tests
 Long-term: Establish timezone/i18n architecture documentation and code review checklist
 
-1.1.2 Data Integrity Guarantee Mechanism Deficiency
+1.2 Data Integrity Guarantee Mechanism Deficiency
 Core Issue: Critical business logic relies on application-layer conventions and magic constants, lacking database-level constraints and type safety guarantees.
 Impact Scope: Affects 5 core models, 15+ API endpoints, all sorting and unit conversion functions.
 Key Evidence:
@@ -37,7 +37,7 @@ Key Evidence:
 Day/Slot/SlotEntry have indexes but no unique constraints (wger/manager/models/day.py:45-78, slot.py:19-57, slot_entry.py:86-152, commits 49bbd18, 6f54568, 2024)
 RepetitionUnit uses self.id == 1 for judgment (wger/core/models/rep_unit.py:55-61, commit 02279ee, 2021-06-23)
 WorkoutLog.str hardcodes "kg" (wger/manager/models/log.py:234-235, commit a434c73, 2024-01-27)
-JSONField lacks schema validation (wger/manager/models/day.py:99-106, slot.py:44-51, commit 30c14310, 2024-10-29)
+JSONField lacks schema validation (wger/manager/models/day.py:99-106, slot.py:44-51, commit 30c1431, 2024-10-29)
 
 Root Cause Analysis:
 
@@ -52,9 +52,9 @@ Immediate fix: Add models.UniqueConstraint(fields=['routine', 'order']), data mi
 Short-term: Introduce enums to replace magic numbers, add Pydantic validation to JSONField
 Long-term: Establish data model design standards, enforce schema-first development
 
-1.1.3 Multi-process Cache Architecture Failure
+1.3 Multi-process Cache Architecture Failure
 Core Issue: Cache design remains in single-process era, key generation and invalidation strategies completely fail in distributed environments.
-Impact Scope: All cache-dependent functions unreliable in multi-process deployment, affecting 90% of API responses.
+Impact Scope: All cache-dependent functions unreliable in multi-process deployment.
 Key Evidence:
 
 Default LocMemCache config unchanged for 12 years (wger/settings_global.py:310-316, commit cfb0196, 2013-06-29)
@@ -72,11 +72,11 @@ Improvement Recommendations:
 
 Immediate fix: Use f'{user_pk}:{year}:{month}:{day}' stable keys
 Short-term: Default to Redis, add multi-process cache tests
-Long-term: Establish cache strategy guide, performance benchmarks
+Long-term: Establish cache strategy guide
 
-1.1.4 N+1 Queries and Performance Degradation
+1.4 N+1 Queries and Performance Degradation
 Core Issue: Lacks systematic query optimization strategy, core functions have severe N+1 problems.
-Impact Scope: PDF export time increased 300%, Routine page load triggers 17+ SQL queries.
+Impact Scope: Multiple SQL queries triggered where single query would suffice.
 Key Evidence:
 
 Day.get_slots_* uses getattr(self, 'prefetched_slots', self.slots.all()) fallback queries (wger/manager/models/day.py:147-177)
@@ -97,7 +97,7 @@ Immediate fix: Provide Routine.objects.with_full_structure() unified prefetch
 Short-term: Add Django Debug Toolbar for N+1 detection
 Long-term: Establish performance benchmark suite
 
-1.1.5 Permission Model Interface Chaos
+1.5 Permission Model Interface Chaos
 Core Issue: Permission checking interface lacks unified contract for 10 years, creating security risks.
 Impact Scope: All REST API permission validation, third-party extension integration.
 Key Evidence:
@@ -119,15 +119,12 @@ Immediate fix: Define interface contract, handle None returns
 Short-term: Audit all model implementations, supplement permission tests
 Long-term: Establish API version management strategy
 
-
-
-
-1.2 Positive Design Choices
-1. Default Ordering and Indexing in Day Model
+2. Positive Design Choices
+2.1 Default Ordering and Indexing in Day Model
 The actual code is located in wger/manager/models/day.py.
 
-2024-10-23 05:52:04 (UTC+13) – Commit 49bbd18997f933fdcc310da336930e2c91d92df0 (original: 2024-10-22 18:52:04 +0200) removed the next_day foreign key and set Meta.ordering = ['order'].
-2025-02-17 04:58:34 (UTC+13) – Commit a685015dcac83a13831bdbb35c325f6651744149 (original: 2025-02-16 16:58:34 +0100) added db_index=True to the order field.
+2024-10-23 05:52:04 (UTC+13) – Commit 49bbd18 removed the next_day foreign key and set Meta.ordering = ['order'].
+2025-02-17 04:58:34 (UTC+13) – Commit a685015 added db_index=True to the order field.
 
 Current code snippet:
 python# wger/manager/models/day.py
@@ -141,16 +138,14 @@ class Day(models.Model):
         verbose_name=_('Order'),
         db_index=True,  # Creates B-tree index in PostgreSQL
     )
-
 Index Explanation: PostgreSQL B-tree can directly hit leaf nodes during incremental reads or range queries on order, avoiding extra I/O in the sort phase.
-Historical Comparison: Examining git show a685015dcac83a13831bdbb35c325f6651744149~1:wger/manager/models/day.py confirms the old version lacked indexing; EXPLAIN would show a Sort node. After upgrade, the execution plan becomes Index Scan.
+Historical Comparison: Examining git show a685015~1:wger/manager/models/day.py confirms the old version lacked indexing; EXPLAIN would show a Sort node. After upgrade, the execution plan becomes Index Scan.
 Use Case: Suitable for read-heavy sorted lists; if the field has low cardinality or very frequent updates, index maintenance costs need evaluation.
-
-2. Centralized React View Assembly
+2.2 Centralized React View Assembly
 Backend React page adaptation is implemented in wger/core/views/react.py.
 
-2023-05-18 21:24:10 (UTC+13) – Commit 2df61751443362d90e9cb0734015f32ff2893ada introduced ReactView.
-2025-04-19 04:24:37 (UTC+13) – Commit 3413420c2be9efb35e33b58812958c13c177e9e2 (original: 2025-04-18 17:24:37 +0200) improved login redirect and documentation.
+2023-05-18 21:24:10 (UTC+13) – Commit 2df6175 introduced ReactView.
+2025-04-19 04:24:37 (UTC+13) – Commit 3413420 improved login redirect and documentation.
 
 Core implementation:
 python# wger/core/views/react.py
@@ -178,17 +173,15 @@ pythonurlpatterns = [
     ),
     ...
 ]
-
 Architectural Significance: This represents a backend "centralized adapter + feature injection" pattern. All React pages share cross-cutting logic for authentication, templates, and Shadow DOM control; new pages only need to set div_id and login_required.
 Testing and Maintenance: End-to-end tests only need to verify ReactView-provided context; compared to pre-2023 practice of separate TemplateView per URL, code volume and maintenance costs are significantly reduced.
-
-3. Dataclass Application in Routine Data
+2.3 Dataclass Application in Routine Data
 Evolution of wger/manager/dataclasses.py:
 
-2024-03-08 08:35:06 (UTC+13) – Commit 9a321b7c8cc0dc9f8181d804741c28b35c179a88 first introduced WorkoutDay and other dataclass structures.
-2024-06-13 01:59:28 (UTC+13) – Commit b445b8b91dfd12c3632d546a44022380b1534d98 enriched SetConfigData fields.
-2025-02-22 01:43:43 (UTC+13) – Commit 946dd706585525fbe561ddcab6b161ae17730e94 further extended config fields and prefetch logic.
-2025-03-10 06:35:45 (UTC+13) – Commit d44b72de5c343569b1e2220d3303258f2bb9bb2c fixed ConfigRequirements determination.
+2024-03-08 08:35:06 (UTC+13) – Commit 9a321b7 first introduced WorkoutDay and other dataclass structures.
+2024-06-13 01:59:28 (UTC+13) – Commit b445b8b enriched SetConfigData fields.
+2025-02-22 01:43:43 (UTC+13) – Commit 946dd70 further extended config fields and prefetch logic.
+2025-03-10 06:35:45 (UTC+13) – Commit d44b72d fixed ConfigRequirements determination.
 
 Simplified core snippet:
 python# wger/manager/dataclasses.py
@@ -208,20 +201,18 @@ class SetConfigData:
     type: str = 'normal'
     slot_entry_id: int | None = None
     ...
-
-Historical Comparison: Viewing git show 9a321b7c8cc0dc9f8181d804741c28b35c179a88^:wger/manager/models/routine.py shows the old date_sequence only returned {date: Day} dictionaries. After introducing dataclasses, tests in wger/manager/tests/test_day.py (commit 065d4328ed95af23845fbde1342b63deb2eb0ee9, 2025-01-04 UTC+13) directly assert attributes like slot.sets[0].exercise.
+Historical Comparison: Viewing git show 9a321b7^:wger/manager/models/routine.py shows the old date_sequence only returned {date: Day} dictionaries. After introducing dataclasses, tests in wger/manager/tests/test_day.py directly assert attributes like slot.sets[0].exercise.
 Alternative Considerations:
 
 namedtuple lacks defaults and has fixed fields, high extension cost.
 TypedDict provides only static type hints, remains dict at runtime, cannot auto-generate comparison methods.
-dataclass combines type hints, attribute access, and auto-methods like eq; performance tests (100k instantiations) show virtually no difference from handwritten classes.
+dataclass combines type hints, attribute access, and auto-methods like eq.
+
+Maintainability: Multiple migrations from 2024-2025 successfully added new attributes to SetConfigData without breaking callers, proving dataclasses suit this scenario's gradual evolution.
 
 
-Maintainability: Multiple migrations from 2024-2025 (e.g., b445b8b91d, 946dd70658) successfully added new attributes to SetConfigData without breaking callers, proving dataclasses suit this scenario's gradual evolution.
 
-
-
-2. Contribution Summary
+3. Contribution Summary
 Issue #1980 - Fix Workout Day Ordering Issue [Zhengrong Chen]
 
 Repository: https://github.com/liebeziv/wger/tree/fix-training-day-order
